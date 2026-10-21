@@ -9,262 +9,338 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: cabecera blanca + pestañas fijas; cada pestaña es una hoja de trabajo con tablas limpias */
+/* Layout: consola de auditoría — barra lateral por fases PHVA, cabecera de página con migas y acciones, contenido en tarjetas blancas */
 :root{
   color-scheme:light;
-  --bg:#FFFFFF; --soft:#F6F7F9; --line:#E3E6EB; --ink:#16191D; --muted:#5F6670;
-  --accent:#1F4E8C; --accent-soft:#EAF0F8;
-  --ok:#17663A; --ok-bg:#E6F4EC; --warn:#8A5A00; --warn-bg:#FCF1DA; --bad:#A3222F; --bad-bg:#FBE7E9;
+  --canvas:#F4F6F9; --surface:#FFFFFF; --soft:#F7F8FA; --line:#E2E6EC; --line-strong:#CDD4DD;
+  --ink:#141A21; --ink-2:#3E4752; --muted:#6B7480;
+  --brand:#1A3D6D; --brand-2:#2B67AE; --brand-soft:#EBF1F9;
+  --s-inh:#E08A3C; --s-res:#2B67AE;
+  --ok:#17663A; --ok-bg:#E5F3EA; --ok-bar:#2E8B57;
+  --warn:#86570A; --warn-bg:#FBF0D8; --warn-bar:#D19A2A;
+  --bad:#A3222F; --bad-bg:#FBE6E8;
   --hi:#A6461B; --hi-bg:#FCEADF;
   --sans:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
   --mono:"IBM Plex Mono",Consolas,ui-monospace,monospace;
+  --shadow:0 1px 2px rgba(16,24,40,.05),0 1px 3px rgba(16,24,40,.06);
   padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
 }
 *{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--ink)}
-body{font-family:var(--sans);font-size:15px;line-height:1.55}
+html,body{margin:0;background:var(--canvas);color:var(--ink)}
+body{font-family:var(--sans);font-size:14.5px;line-height:1.55}
 [hidden]{display:none!important}
-.wrap{max-width:1140px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
-h1,h2,h3{margin:0;text-wrap:balance;font-weight:600;letter-spacing:-.01em}
-a{color:var(--accent)}
-code,.mono{font-family:var(--mono);font-size:.88em}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+h1,h2,h3,h4{margin:0;text-wrap:balance;font-weight:600;letter-spacing:-.01em}
+a{color:var(--brand-2)}
+.mono{font-family:var(--mono);font-size:.9em}
+:focus-visible{outline:2px solid var(--brand-2);outline-offset:2px;border-radius:6px}
 
-header.top{padding-block:36px 20px}
-.eyebrow{font-size:12.5px;font-weight:500;color:var(--muted);letter-spacing:.02em}
-header.top h1{font-size:clamp(24px,3.4vw,34px);line-height:1.2;margin-top:8px;max-width:30ch}
-header.top p.lead{color:var(--muted);margin:10px 0 0;max-width:72ch}
-.meta{display:flex;flex-wrap:wrap;gap:6px 22px;margin-top:16px;font-size:13.5px;color:var(--muted)}
-.meta b{color:var(--ink);font-weight:500}
+.app{display:grid;grid-template-columns:264px minmax(0,1fr);min-height:100vh}
 
-nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
-nav.tabs .wrap{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
-nav.tabs .wrap::-webkit-scrollbar{display:none}
-nav.tabs button{flex:none;font:500 14px var(--sans);color:var(--muted);background:none;border:0;border-bottom:2px solid transparent;padding:14px 12px 12px;cursor:pointer;white-space:nowrap}
-nav.tabs button:hover{color:var(--ink)}
-nav.tabs button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent)}
-nav.tabs .n{font-family:var(--mono);font-size:11px;color:var(--muted);margin-left:5px;background:var(--soft);border-radius:999px;padding:1px 6px}
+/* barra lateral */
+aside{position:sticky;top:0;height:100vh;overflow-y:auto;background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:22px 16px 18px max(16px,env(safe-area-inset-left,0px))}
+.brand{display:flex;gap:12px;align-items:center;padding:0 8px 20px;border-bottom:1px solid var(--line)}
+.mark{flex:none;width:40px;height:40px;border-radius:10px;background:var(--brand);color:#fff;display:grid;place-items:center}
+.mark svg{width:22px;height:22px}
+.brand b{display:block;font-size:14px;line-height:1.25}
+.brand span{display:block;font-size:12px;color:var(--muted)}
+nav.side{display:flex;flex-direction:column;gap:2px;padding-top:14px;flex:1}
+.grp{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:14px 10px 6px;display:flex;align-items:center;gap:8px}
+.grp i{font-style:normal;width:18px;height:18px;border-radius:5px;background:var(--brand-soft);color:var(--brand);display:grid;place-items:center;font-size:10.5px;letter-spacing:0}
+nav.side button{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;color:var(--ink-2);font-size:14px;font-weight:500}
+nav.side button svg{width:17px;height:17px;flex:none;color:var(--muted)}
+nav.side button .n{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--muted)}
+nav.side button:hover{background:var(--soft);color:var(--ink)}
+nav.side button[aria-current="page"]{background:var(--brand-soft);color:var(--brand)}
+nav.side button[aria-current="page"] svg{color:var(--brand)}
+nav.side button:focus-visible{outline:2px solid var(--brand-2)}
+.who{border-top:1px solid var(--line);padding:14px 10px 0;font-size:12.5px;color:var(--muted)}
+.who b{display:block;color:var(--ink);font-weight:600;font-size:13px}
 
-main{padding-block:28px 56px}
-.panel h2{font-size:22px}
-.panel .intro{color:var(--muted);margin:6px 0 20px;max-width:78ch}
-.panel h3{font-size:15.5px;margin:26px 0 10px}
+/* principal */
+.main{min-width:0;padding-left:max(28px,env(safe-area-inset-left,0px));padding-right:max(28px,env(safe-area-inset-right,0px));padding-block:0 48px}
+.pagehead{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-end;justify-content:space-between;padding-block:26px 22px}
+.crumb{font-size:12.5px;color:var(--muted);display:flex;gap:6px;align-items:center}
+.crumb b{color:var(--ink-2);font-weight:500}
+.pagehead h1{font-size:26px;line-height:1.2;margin-top:6px}
+.pagehead p{margin:6px 0 0;color:var(--muted);max-width:76ch}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:7px;text-decoration:none;font:500 13.5px var(--sans);padding:8px 13px;border-radius:8px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.btn svg{width:16px;height:16px}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn:hover{border-color:var(--brand-2)}
+.btn.primary:hover{background:#15325A}
 
-/* KPI */
-.kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
-.kpi{border:1px solid var(--line);border-radius:10px;padding:14px 16px}
-.kpi .v{font-size:28px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.1}
-.kpi .k{font-size:13px;color:var(--muted);margin-top:4px}
-.kpi.ok .v{color:var(--ok)} .kpi.warn .v{color:var(--warn)}
-@media (max-width:820px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.bar{display:flex;height:8px;border-radius:999px;overflow:hidden;background:var(--soft);margin-top:14px}
-.bar i{display:block;height:100%}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow)}
+.card-h{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--line)}
+.card-h h3{font-size:15px}
+.card-h p{margin:2px 0 0;font-size:13px;color:var(--muted)}
+.card-b{padding:18px 20px}
+.stack{display:grid;gap:18px}
+.g2{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:1100px){.g2{grid-template-columns:minmax(0,1fr)}}
 
-.two{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:28px;align-items:start}
-.two.risk{grid-template-columns:minmax(0,1fr) 340px}
-@media (max-width:900px){.two,.two.risk{grid-template-columns:minmax(0,1fr)}}
+/* hero */
+.hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px;align-items:center;padding:24px 26px;background:linear-gradient(135deg,#1A3D6D 0%,#24548F 100%);border:0;color:#fff}
+.hero .k{font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.75;font-weight:600}
+.hero h2{font-size:22px;line-height:1.25;margin-top:6px;max-width:38ch}
+.hero p{margin:8px 0 0;opacity:.85;font-size:14px;max-width:70ch}
+.hero .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.hero .chips span{font-size:12px;padding:3px 9px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18)}
+.ring{position:relative;width:132px;height:132px}
+.ring svg{width:132px;height:132px;transform:rotate(-90deg)}
+.ring .c{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.ring .c b{font-size:24px;line-height:1;font-variant-numeric:tabular-nums}
+.ring .c span{display:block;font-size:11.5px;opacity:.8;margin-top:4px}
+@media (max-width:640px){.hero{grid-template-columns:minmax(0,1fr)}}
 
-.scale{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border:1px solid var(--line);border-radius:10px;overflow:hidden}
-.scale div{padding:12px 14px;border-right:1px solid var(--line)}
-.scale div:last-child{border-right:0}
-.scale b{font-size:20px;font-variant-numeric:tabular-nums}
-.scale span{display:block;font-weight:600;font-size:13.5px;margin-top:2px}
-.scale p{margin:4px 0 0;font-size:12.5px;color:var(--muted)}
-@media (max-width:760px){.scale{grid-template-columns:minmax(0,1fr)}.scale div{border-right:0;border-bottom:1px solid var(--line)}}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.kpi{padding:16px 18px}
+.kpi .t{font-size:12.5px;color:var(--muted);font-weight:500}
+.kpi .v{font-size:28px;font-weight:600;font-variant-numeric:tabular-nums;line-height:1.15;margin-top:6px}
+.kpi .s{font-size:12.5px;color:var(--muted);margin-top:4px}
+.kpi .badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;margin-top:8px}
+@media (max-width:900px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
-.phva{display:grid;gap:8px}
-.phva button{all:unset;cursor:pointer;display:grid;grid-template-columns:34px minmax(0,1fr);gap:12px;align-items:start;padding:12px 14px;border:1px solid var(--line);border-radius:10px}
-.phva button:hover{border-color:var(--accent);background:var(--accent-soft)}
-.phva button:focus-visible{outline:2px solid var(--accent)}
-.phva .l{font-weight:700;color:var(--accent);font-size:15px;text-align:center;border-radius:6px;background:var(--accent-soft);padding:4px 0}
-.phva .t{font-weight:600;font-size:14px}
-.phva .d{color:var(--muted);font-size:13px}
+/* gráfico de madurez */
+.mchart{position:relative}
+.mrow{display:grid;grid-template-columns:230px minmax(0,1fr) 34px;gap:12px;align-items:center;padding:5px 0;cursor:default}
+.mrow .lab{font-size:13px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mrow .lab .mono{color:var(--ink);font-weight:500;margin-right:6px}
+.track{position:relative;height:16px}
+.track .gl{position:absolute;top:-6px;bottom:-6px;width:1px;background:var(--line)}
+.track .b{position:absolute;left:0;top:2px;height:12px;border-radius:0 4px 4px 0}
+.mrow .val{font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--ink-2)}
+.mrow:hover .lab,.mrow:focus .lab{color:var(--ink)}
+.mrow:hover .b{filter:brightness(.92)}
+.maxis{display:grid;grid-template-columns:230px minmax(0,1fr) 34px;gap:12px;margin-top:6px}
+.maxis .t{position:relative;height:16px;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.maxis .t span{position:absolute;transform:translateX(-50%)}
+@media (max-width:640px){.mrow,.maxis{grid-template-columns:120px minmax(0,1fr) 28px}.mrow .lab .nm{display:none}}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:10px;height:10px;border-radius:3px;display:inline-block}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+
+/* dumbbell de riesgos */
+.dchart{display:grid;gap:4px}
+.drow{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.drow:last-of-type{border-bottom:0}
+.drow .lab{font-family:var(--mono);font-size:12px;font-weight:500}
+.dtrack{position:relative;height:22px}
+.dtrack .zone{position:absolute;top:0;bottom:0;width:1px;background:var(--line)}
+.dtrack .ln{position:absolute;top:10px;height:2px;background:var(--line-strong)}
+.dtrack .pt{position:absolute;top:3px;width:16px;height:16px;border-radius:50%;border:2px solid #fff;transform:translateX(-50%);box-shadow:0 0 0 1px rgba(0,0,0,.04)}
+.dtrack .tx{position:absolute;top:2px;font-size:11.5px;font-weight:600;color:var(--ink-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.dzones{display:grid;grid-template-columns:96px minmax(0,1fr);gap:12px;margin-bottom:4px}
+.dzones .z{position:relative;height:18px;font-size:11px;color:var(--muted)}
+.dzones .z span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+
+.tip{position:fixed;z-index:20;pointer-events:none;max-width:300px;background:#141A21;color:#fff;font-size:12.5px;line-height:1.45;padding:9px 11px;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
+.tip b{display:block;font-size:13px;margin-bottom:2px}
+
+/* escala y fases */
+.scale{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.scale div{border:1px solid var(--line);border-radius:10px;padding:12px}
+.scale b{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:7px;font-size:14px}
+.scale span{display:block;font-weight:600;font-size:13.5px;margin-top:8px}
+.scale p{margin:3px 0 0;font-size:12.5px;color:var(--muted)}
+@media (max-width:760px){.scale{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.phase{display:grid;gap:10px}
+.phase button{all:unset;cursor:pointer;display:grid;grid-template-columns:36px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 14px;border:1px solid var(--line);border-radius:10px}
+.phase button:hover{border-color:var(--brand-2);background:var(--brand-soft)}
+.phase button:focus-visible{outline:2px solid var(--brand-2)}
+.phase .l{display:grid;place-items:center;width:36px;height:36px;border-radius:9px;background:var(--brand);color:#fff;font-weight:700}
+.phase .t{font-weight:600;font-size:14px}
+.phase .d{display:block;color:var(--muted);font-size:12.5px}
+.phase svg{width:16px;height:16px;color:var(--muted)}
 
 /* tablas */
-.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
-table{border-collapse:collapse;width:100%;font-size:14px}
-th,td{text-align:left;vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--line)}
-th{font-size:12px;font-weight:600;color:var(--muted);background:var(--soft);white-space:nowrap}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{text-align:left;vertical-align:top;padding:12px 16px;border-bottom:1px solid var(--line)}
+th{font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);background:var(--soft);white-space:nowrap}
+tbody tr:hover td{background:#FAFBFC}
 tr:last-child td{border-bottom:0}
-td.id{font-family:var(--mono);font-size:12.5px;font-weight:500;white-space:nowrap}
+td.id{font-family:var(--mono);font-size:12.5px;font-weight:500;white-space:nowrap;color:var(--ink)}
 td.c{text-align:center;font-variant-numeric:tabular-nums}
-.sub{display:block;color:var(--muted);font-size:13px;margin-top:3px}
+.sub{display:block;color:var(--muted);font-size:12.5px;margin-top:3px}
 .tags{display:flex;flex-wrap:wrap;gap:4px}
-.tag{font-family:var(--mono);font-size:11.5px;padding:1px 7px;border-radius:4px;background:var(--soft);border:1px solid var(--line);white-space:nowrap}
-.tag.comp{background:var(--accent-soft);border-color:#C9D7EA;color:var(--accent)}
-
-.pill{display:inline-block;font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.tag{font-family:var(--mono);font-size:11.5px;padding:1px 7px;border-radius:5px;background:var(--soft);border:1px solid var(--line);white-space:nowrap;color:var(--ink-2)}
+.tag.comp{background:var(--brand-soft);border-color:#CBD8EA;color:var(--brand)}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
 .p-ok{color:var(--ok);background:var(--ok-bg)} .p-warn{color:var(--warn);background:var(--warn-bg)}
 .p-bad{color:var(--bad);background:var(--bad-bg)} .p-hi{color:var(--hi);background:var(--hi-bg)}
+.meter{display:inline-flex;gap:3px;vertical-align:middle;margin-right:8px}
+.meter i{width:14px;height:6px;border-radius:2px;background:var(--line)}
+.meter.l3 i.on,.meter.l4 i.on{background:var(--ok-bar)} .meter.l2 i.on{background:var(--warn-bar)} .meter.l1 i.on,.meter.l0 i.on{background:var(--bad)}
 
-.meter{display:inline-flex;gap:3px;vertical-align:middle;margin-right:6px}
-.meter i{width:12px;height:6px;border-radius:2px;background:var(--line)}
-.meter.l3 i.on,.meter.l4 i.on{background:var(--ok)} .meter.l2 i.on{background:#D49A1C} .meter.l1 i.on,.meter.l0 i.on{background:var(--bad)}
-
-/* heatmap */
-.heat{border:1px solid var(--line);border-radius:10px;padding:16px}
-.heat h3{margin:0 0 12px;font-size:14px}
-.hgrid{display:grid;grid-template-columns:26px repeat(5,minmax(0,1fr));gap:4px;font-family:var(--mono);font-size:11px}
-.hgrid .ax{display:flex;align-items:center;justify-content:center;color:var(--muted)}
-.hgrid .cell{aspect-ratio:1.3;max-width:100%;border-radius:5px;display:flex;flex-wrap:wrap;gap:3px;align-content:center;justify-content:center;padding:3px}
-.b1{background:#EDF6F0} .b2{background:#FCF4E1} .b3{background:#FCE9DE} .b4{background:#FBE3E6}
-.pin{font-size:10px;font-weight:500;padding:0 4px;border-radius:3px;background:var(--ink);color:#fff}
-.pin.res{background:#fff;color:var(--ink);border:1px dashed var(--ink)}
-.legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:12px;font-size:12px;color:var(--muted)}
-.legend span{display:inline-flex;align-items:center;gap:5px}
-.sw{width:11px;height:11px;border-radius:3px;display:inline-block}
-
-/* mapeo */
-details.sql summary{cursor:pointer;color:var(--accent);font-size:13px;font-weight:500;margin-top:6px;list-style:none}
+details.sql summary{cursor:pointer;color:var(--brand-2);font-size:12.5px;font-weight:500;margin-top:8px;list-style:none;display:inline-flex;gap:5px;align-items:center}
 details.sql summary::-webkit-details-marker{display:none}
-details.sql summary::before{content:"▸ ";}
-details.sql[open] summary::before{content:"▾ ";}
-.code{position:relative;margin-top:6px;background:var(--soft);border:1px solid var(--line);border-radius:6px}
-.code pre{margin:0;padding:10px 12px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.5}
-.copy{position:absolute;top:6px;right:6px;font:500 11.5px var(--sans);background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:5px;padding:2px 8px;cursor:pointer}
-.copy:hover{border-color:var(--accent);color:var(--accent)}
+details.sql summary::before{content:"";width:0;height:0;border-left:5px solid currentColor;border-top:4px solid transparent;border-bottom:4px solid transparent;transition:transform .15s}
+details.sql[open] summary::before{transform:rotate(90deg)}
+.code{position:relative;margin-top:8px;background:#0F1720;border-radius:8px}
+.code pre{margin:0;padding:12px 14px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.55;color:#DCE6F0}
+.copy{position:absolute;top:8px;right:8px;font:500 11.5px var(--sans);background:rgba(255,255,255,.08);color:#DCE6F0;border:1px solid rgba(255,255,255,.18);border-radius:6px;padding:3px 9px;cursor:pointer}
+.copy:hover{background:rgba(255,255,255,.16)}
 
-.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:12px}
-.card{border:1px solid var(--line);border-radius:10px;padding:14px 16px;display:grid;grid-template-rows:auto auto 1fr auto;gap:6px;min-width:0}
-.card .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
-.card .top code{font-weight:500;color:var(--accent)}
-.card h4{margin:0;font-size:15px;font-weight:600}
-.card p{margin:0;font-size:14px}
-.card .crit{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:8px}
-.card .crit b{color:var(--ink);font-weight:500}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.oc{padding:16px 18px;display:grid;grid-template-rows:auto auto 1fr auto;gap:8px;min-width:0}
+.oc .top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.oc .num{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.oc .cid{font-family:var(--mono);font-weight:500;color:var(--brand);background:var(--brand-soft);border-radius:6px;padding:2px 8px;font-size:12.5px}
+.oc h4{font-size:15px}
+.oc p{margin:0;font-size:13.5px;color:var(--ink-2)}
+.oc .crit{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:10px}
+.oc .crit b{color:var(--ink);font-weight:600}
 
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
-.chips button{font:500 13px var(--sans);border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;padding:5px 12px;cursor:pointer}
-.chips button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
-.note{font-size:13.5px;color:var(--muted);margin:12px 0 0;max-width:85ch}
+.seg{display:inline-flex;flex-wrap:wrap;gap:2px;background:var(--soft);border:1px solid var(--line);border-radius:9px;padding:3px}
+.seg button{font:500 13px var(--sans);border:0;background:transparent;color:var(--ink-2);border-radius:7px;padding:5px 11px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.seg button .k{color:var(--muted);font-family:var(--mono);font-size:11.5px;margin-left:4px}
 
-.links{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
-.links a{display:block;text-decoration:none;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
-.links a:hover{border-color:var(--accent)}
-.links b{display:block;font-weight:600}
-.links span{font-size:13px;color:var(--muted);word-break:break-all}
+.steps{counter-reset:s;display:grid;gap:0}
+.steps .st{display:grid;grid-template-columns:40px minmax(0,1fr);gap:14px;padding:12px 0;border-bottom:1px solid var(--line)}
+.steps .st:last-child{border-bottom:0}
+.steps .st b.n{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--brand-soft);color:var(--brand);font-size:13px;font-variant-numeric:tabular-nums}
+.steps .st .f{font-family:var(--mono);font-size:13px;font-weight:500}
+.steps .st p{margin:2px 0 0;font-size:13px;color:var(--muted)}
+.note{font-size:13px;color:var(--muted);margin:0;padding:12px 20px;border-top:1px solid var(--line);background:var(--soft);border-radius:0 0 12px 12px}
 
-footer{border-top:1px solid var(--line);padding-block:22px 36px;color:var(--muted);font-size:13px}
-@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+footer.foot{margin-top:28px;font-size:12.5px;color:var(--muted)}
+
+/* móvil */
+@media (max-width:900px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  aside{position:sticky;top:env(safe-area-inset-top,0px);z-index:8;height:auto;flex-direction:row;align-items:center;gap:10px;padding:10px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));border-right:0;border-bottom:1px solid var(--line);overflow:visible}
+  .brand{padding:0;border:0;flex:none}
+  .brand div{display:none}
+  .mark{width:34px;height:34px}
+  nav.side{flex-direction:row;padding:0;overflow-x:auto;gap:2px;scrollbar-width:none}
+  nav.side::-webkit-scrollbar{display:none}
+  .grp,.who{display:none}
+  nav.side button{flex:none;padding:7px 10px;font-size:13.5px}
+  nav.side button svg,nav.side button .n{display:none}
+  .main{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header class="top">
-    <div class="eyebrow">Universidad Nacional · Escuela de Informática · Administración de Bases de Datos</div>
-    <h1>Controles para Riesgos de Confidencialidad Tareas del administrador de Bases de Datos</h1>
-    <p class="lead">Instrumento de evaluación basado en ISO/IEC 27001:2022 (Anexo A) e ISO/IEC 27002:2022, implementado y auditado en Oracle Database 21c Express Edition siguiendo el ciclo PHVA.</p>
-    <div class="meta">
-      <div>Estudiante: <b>Jeimy Espinoza Barquero</b></div>
-      <div>Profesor: <b>Johnny Villalobos Murillo</b></div>
-      <div>Periodo: <b>II Ciclo 2026</b></div>
-      <div>Motor: <b>Oracle 21c XE (CDB XE · PDB XEPDB1)</b></div>
+<div class="app">
+  <aside>
+    <div class="brand">
+      <span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.4-3 8.3-7 9.5C8 19.3 5 15.4 5 11V6l7-3z"/><path d="M9.2 11.8l2 2 3.8-4"/></svg></span>
+      <div><b>Confidencialidad DBA</b><span>ISO/IEC 27001:2022 · Oracle 21c XE</span></div>
     </div>
-  </header>
+    <nav class="side" id="side" aria-label="Secciones"></nav>
+    <div class="who"><b>Jeimy Espinoza Barquero</b>Administración de Bases de Datos<br>UNA · II Ciclo 2026</div>
+  </aside>
+
+  <div class="main">
+    <div class="pagehead">
+      <div>
+        <div class="crumb"><span id="crumb-fase">Resumen</span><span aria-hidden="true">/</span><b id="crumb-t">Panel general</b></div>
+        <h1 id="ph-t">Controles para Riesgos de Confidencialidad Tareas del administrador de Bases de Datos</h1>
+        <p id="ph-d"></p>
+      </div>
+      <div class="actions">
+        <a class="btn" href="https://github.com/JeimyE/controles-confidencialidad-dba"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5"/></svg>Repositorio</a>
+        <a class="btn primary" href="informe/Informe_Controles_Confidencialidad_DBA_Jeimy_Espinoza.pdf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>Informe PDF</a>
+      </div>
+    </div>
+
+    <!-- RESUMEN -->
+    <section id="resumen" class="stack">
+      <div class="card hero">
+        <div>
+          <div class="k">Evaluación del 21 de octubre de 2026</div>
+          <h2>16 de 18 controles cumplen en el laboratorio Oracle 21c XE</h2>
+          <p>Marco de controles del Anexo A de ISO/IEC 27001:2022 aplicado a las tareas del DBA sobre datos personales protegidos por la Ley N.° 8968, verificado con scripts SQL reproducibles.</p>
+          <div class="chips"><span>CDB XE · PDB XEPDB1</span><span>Ciclo PHVA</span><span>Escala de madurez 0–4</span><span>Prof. Johnny Villalobos Murillo</span></div>
+        </div>
+        <div class="ring" id="ring" role="img" aria-label="16 de 18 controles cumplen"></div>
+      </div>
+      <div class="kpis" id="kpis"></div>
+      <div class="g2">
+        <div class="card">
+          <div class="card-h"><div><h3>Madurez por control</h3><p>Nivel alcanzado en la escala 0–4, con evidencia de los scripts 20 y 21</p></div>
+            <div class="legend"><span><i class="sw" style="background:var(--ok-bar)"></i>Cumple (3–4)</span><span><i class="sw" style="background:var(--warn-bar)"></i>Parcial (2)</span></div></div>
+          <div class="card-b"><div class="mchart" id="mchart"></div></div>
+        </div>
+        <div class="stack">
+          <div class="card">
+            <div class="card-h"><div><h3>Riesgo inherente y residual</h3><p>Nivel = impacto × probabilidad (1–25)</p></div>
+              <div class="legend"><span><i class="dot" style="background:var(--s-inh)"></i>Inherente</span><span><i class="dot" style="background:var(--s-res)"></i>Residual</span></div></div>
+            <div class="card-b" id="dchart"></div>
+          </div>
+          <div class="card">
+            <div class="card-h"><div><h3>Ciclo PHVA</h3><p>Cada fase lleva a sus secciones</p></div></div>
+            <div class="card-b phase">
+              <button type="button" data-go="riesgos"><span class="l">P</span><span><span class="t">Planificar</span><span class="d">Riesgos, tareas del DBA y mapeo de controles</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></button>
+              <button type="button" data-go="scripts"><span class="l">H</span><span><span class="t">Hacer</span><span class="d">Scripts de implementación en Oracle 21c XE</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></button>
+              <button type="button" data-go="matriz"><span class="l">V</span><span><span class="t">Verificar</span><span class="d">Observables, matriz de evaluación y pruebas</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></button>
+              <button type="button" data-go="mejora"><span class="l">A</span><span><span class="t">Actuar</span><span class="d">Hallazgos y plan de mejora</span></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h"><div><h3>Escala de madurez</h3><p>El estado se deriva del nivel: 0–1 No cumple · 2 Parcial · 3–4 Cumple</p></div></div>
+        <div class="card-b scale">
+          <div><b style="background:var(--bad-bg);color:var(--bad)">0</b><span>Inexistente</span><p>No hay control ni evidencia.</p></div>
+          <div><b style="background:var(--bad-bg);color:var(--bad)">1</b><span>Inicial</span><p>Se aplica de forma ad hoc, sin evidencia reproducible.</p></div>
+          <div><b style="background:var(--warn-bg);color:var(--warn)">2</b><span>Parcial</span><p>Implementado en parte o con brechas conocidas.</p></div>
+          <div><b style="background:var(--ok-bg);color:var(--ok)">3</b><span>Definido</span><p>Implementado, documentado y con evidencia SQL reproducible.</p></div>
+          <div><b style="background:var(--ok-bg);color:var(--ok)">4</b><span>Gestionado</span><p>Además verificado con pruebas automatizadas.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="riesgos" hidden>
+      <div class="card"><div class="tbl"><table><thead><tr><th>ID</th><th>Riesgo</th><th>I</th><th>P</th><th>Inherente</th><th>Controles</th><th>Residual</th></tr></thead><tbody id="tb-riesgos"></tbody></table></div>
+      <p class="note">Bandas: Bajo 1–4 · Medio 5–9 · Alto 10–15 · Crítico 16–25. El residual estima la probabilidad después de aplicar los controles.</p></div>
+    </section>
+
+    <section id="tareas" hidden>
+      <div class="card"><div class="tbl"><table><thead><tr><th>ID</th><th>Tarea</th><th>Actividades</th><th>Frecuencia</th><th>Riesgos</th><th>Controles</th><th>Script</th></tr></thead><tbody id="tb-tareas"></tbody></table></div>
+      <p class="note">Los controles en azul (A.8.8, A.8.24, A.8.33) son complementarios: no están en la lista del enunciado, pero corresponden a las tareas de cifrado, parcheo y clones DEV/TEST.</p></div>
+    </section>
+
+    <section id="mapeo" hidden>
+      <div class="card"><div class="tbl"><table><thead><tr><th>Control</th><th>Implementación en Oracle 21c XE</th><th>Evidencia observable</th><th>Tareas</th><th>Script</th></tr></thead><tbody id="tb-mapeo"></tbody></table></div></div>
+    </section>
+
+    <section id="observables" hidden><div class="cards" id="obs"></div></section>
+
+    <section id="matriz" hidden>
+      <div class="card">
+        <div class="card-h"><div><h3>Tarea · Riesgo · Control · Criterio 0–4 · Evidencia · Estado</h3><p>Alcance: esquema APP_CONF y cuentas del laboratorio</p></div><div class="seg" id="f-matriz"></div></div>
+        <div class="tbl"><table><thead><tr><th>Tarea</th><th>Riesgo</th><th>Control</th><th>Criterio 0–4</th><th>Evidencia</th><th>Estado</th></tr></thead><tbody id="tb-matriz"></tbody></table></div>
+      </div>
+    </section>
+
+    <section id="pruebas" hidden>
+      <div class="card">
+        <div class="card-h"><div><h3>25 pruebas · 22 conformes · 3 pendientes</h3><p>Las negativas son conformes cuando Oracle rechaza la acción con el error esperado</p></div><div class="seg" id="f-pruebas"></div></div>
+        <div class="tbl"><table><thead><tr><th>ID</th><th>Tipo</th><th>Control</th><th>Procedimiento</th><th>Resultado esperado</th><th>Herramienta</th><th>Resultado</th></tr></thead><tbody id="tb-pruebas"></tbody></table></div>
+      </div>
+    </section>
+
+    <section id="mejora" hidden>
+      <div class="card"><div class="tbl"><table><thead><tr><th>Control</th><th>Hallazgo</th><th>Acción de mejora</th><th>Responsable</th><th>Meta</th></tr></thead><tbody id="tb-mejora"></tbody></table></div></div>
+    </section>
+
+    <section id="scripts" hidden>
+      <div class="card"><div class="card-b steps" id="tb-scripts"></div>
+      <p class="note">Los archivos están en la carpeta <span class="mono">scripts/</span> del repositorio, junto con evidencia_pruebas.txt, evidencia_controles.txt y evidencia_backup.log.</p></div>
+    </section>
+
+    <footer class="foot">Referencias: ISO/IEC 27001:2022, ISO/IEC 27002:2022, Ley N.° 8968 y su Reglamento (Decreto 37554-JP), documentación de Oracle Database 21c. Datos de laboratorio ficticios.</footer>
+  </div>
 </div>
-
-<nav class="tabs" aria-label="Secciones">
-  <div class="wrap" role="tablist" id="tablist"></div>
-</nav>
-
-<main class="wrap">
-  <section class="panel" id="resumen" role="tabpanel">
-    <h2>Resumen de la evaluación</h2>
-    <p class="intro">Resultados obtenidos el 21 de octubre de 2026 con los scripts de verificación (20) y de pruebas (21). Alcance: esquema de laboratorio APP_CONF y sus cuentas.</p>
-    <div class="kpis" id="kpis"></div>
-    <div class="bar" id="bar" aria-hidden="true"></div>
-    <div class="two" style="margin-top:28px">
-      <div>
-        <h3 style="margin-top:0">Escala de madurez 0–4</h3>
-        <div class="scale">
-          <div><b style="color:var(--bad)">0</b><span>Inexistente</span><p>No hay control ni evidencia.</p></div>
-          <div><b style="color:var(--bad)">1</b><span>Inicial</span><p>Ad hoc, sin evidencia reproducible.</p></div>
-          <div><b style="color:var(--warn)">2</b><span>Parcial</span><p>Implementado en parte o con brechas.</p></div>
-          <div><b style="color:var(--ok)">3</b><span>Definido</span><p>Implementado, documentado y con evidencia SQL.</p></div>
-          <div><b style="color:var(--ok)">4</b><span>Gestionado</span><p>Además verificado con pruebas automatizadas.</p></div>
-        </div>
-        <p class="note">Estado: <span class="pill p-bad">No cumple</span> niveles 0–1 · <span class="pill p-warn">Parcial</span> nivel 2 · <span class="pill p-ok">Cumple</span> niveles 3–4.</p>
-        <h3>Documentos</h3>
-        <div class="links">
-          <a href="https://github.com/JeimyE/controles-confidencialidad-dba"><b>Repositorio</b><span>Scripts SQL, RMAN y archivos de evidencia</span></a>
-          <a href="informe/Informe_Controles_Confidencialidad_DBA_Jeimy_Espinoza.pdf"><b>Informe (PDF)</b><span>Marco teórico, resultados, hallazgos y uso de IA</span></a>
-        </div>
-      </div>
-      <div>
-        <h3 style="margin-top:0">Ciclo PHVA</h3>
-        <div class="phva">
-          <button type="button" data-go="riesgos"><span class="l">P</span><span><span class="t">Planificar</span><span class="d"> · Riesgos, tareas del DBA y mapeo de controles</span></span></button>
-          <button type="button" data-go="scripts"><span class="l">H</span><span><span class="t">Hacer</span><span class="d"> · Scripts de implementación en Oracle 21c XE</span></span></button>
-          <button type="button" data-go="matriz"><span class="l">V</span><span><span class="t">Verificar</span><span class="d"> · 15 observables, matriz de evaluación y batería de pruebas</span></span></button>
-          <button type="button" data-go="mejora"><span class="l">A</span><span><span class="t">Actuar</span><span class="d"> · Hallazgos y plan de mejora</span></span></button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="panel" id="riesgos" role="tabpanel" hidden>
-    <h2>Riesgos de confidencialidad</h2>
-    <p class="intro">Impacto (I) y probabilidad (P) en escala 1–5; nivel = I × P. El riesgo residual estima la probabilidad después de aplicar los controles.</p>
-    <div class="two risk">
-      <div class="tbl"><table><thead><tr><th>ID</th><th>Riesgo</th><th>I</th><th>P</th><th>Inherente</th><th>Controles</th><th>Residual</th></tr></thead><tbody id="tb-riesgos"></tbody></table></div>
-      <div class="heat">
-        <h3>Mapa de calor</h3>
-        <div class="hgrid" id="heat"></div>
-        <div class="legend"><span><i class="sw b1"></i>Bajo 1–4</span><span><i class="sw b2"></i>Medio 5–9</span><span><i class="sw b3"></i>Alto 10–15</span><span><i class="sw b4"></i>Crítico 16–25</span></div>
-        <div class="legend"><span><i class="pin">R1</i> inherente</span><span><i class="pin res">R1</i> residual</span><span>Filas: impacto · Columnas: probabilidad</span></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="panel" id="tareas" role="tabpanel" hidden>
-    <h2>Tareas críticas del DBA</h2>
-    <p class="intro">Las 12 tareas del enunciado con su frecuencia, el riesgo que atienden, los controles que las gobiernan y el script que las implementa.</p>
-    <div class="tbl"><table><thead><tr><th>ID</th><th>Tarea</th><th>Actividades</th><th>Frecuencia</th><th>Riesgos</th><th>Controles</th><th>Script</th></tr></thead><tbody id="tb-tareas"></tbody></table></div>
-    <p class="note">Los controles resaltados en azul (A.8.8, A.8.24, A.8.33) son complementarios: no están en la lista del enunciado, pero corresponden a las tareas de cifrado, parcheo y clones DEV/TEST.</p>
-  </section>
-
-  <section class="panel" id="mapeo" role="tabpanel" hidden>
-    <h2>Mapeo de controles ISO</h2>
-    <p class="intro">Implementación de cada control en Oracle 21c XE y la consulta que un auditor ejecuta para obtener la evidencia.</p>
-    <div class="tbl"><table><thead><tr><th>Control</th><th>Implementación</th><th>Evidencia observable</th><th>Tareas</th><th>Script</th></tr></thead><tbody id="tb-mapeo"></tbody></table></div>
-  </section>
-
-  <section class="panel" id="observables" role="tabpanel" hidden>
-    <h2>15 controles observables por un auditor externo</h2>
-    <p class="intro">Qué puede comprobar un auditor sin depender de la palabra del DBA, y con qué criterio lo acepta.</p>
-    <div class="cards" id="obs"></div>
-  </section>
-
-  <section class="panel" id="matriz" role="tabpanel" hidden>
-    <h2>Matriz de evaluación</h2>
-    <p class="intro">Tarea · Riesgo · Control · Criterio 0–4 · Evidencia · Estado, con la evidencia real obtenida en el laboratorio.</p>
-    <div class="chips" id="f-matriz"></div>
-    <div class="tbl"><table><thead><tr><th>Tarea</th><th>Riesgo</th><th>Control</th><th>Criterio 0–4</th><th>Evidencia</th><th>Estado</th></tr></thead><tbody id="tb-matriz"></tbody></table></div>
-  </section>
-
-  <section class="panel" id="pruebas" role="tabpanel" hidden>
-    <h2>Batería de pruebas</h2>
-    <p class="intro">Las pruebas negativas son conformes cuando Oracle rechaza la acción con el error esperado. PRB-03, PRB-19 y PRB-24 quedan pendientes.</p>
-    <div class="chips" id="f-pruebas"></div>
-    <div class="tbl"><table><thead><tr><th>ID</th><th>Tipo</th><th>Control</th><th>Procedimiento</th><th>Resultado esperado</th><th>Herramienta</th><th>Resultado</th></tr></thead><tbody id="tb-pruebas"></tbody></table></div>
-  </section>
-
-  <section class="panel" id="mejora" role="tabpanel" hidden>
-    <h2>Hallazgos y plan de mejora</h2>
-    <p class="intro">Brechas encontradas por la verificación y acción propuesta para cada una.</p>
-    <div class="tbl"><table><thead><tr><th>Control</th><th>Hallazgo</th><th>Acción de mejora</th><th>Responsable</th><th>Nivel meta</th></tr></thead><tbody id="tb-mejora"></tbody></table></div>
-  </section>
-
-  <section class="panel" id="scripts" role="tabpanel" hidden>
-    <h2>Scripts</h2>
-    <p class="intro">Se ejecutan en este orden. Los scripts 21 y 20 generan los archivos de evidencia que respaldan la matriz.</p>
-    <div class="tbl"><table><thead><tr><th>#</th><th>Archivo</th><th>Qué hace</th></tr></thead><tbody id="tb-scripts"></tbody></table></div>
-  </section>
-</main>
-
-<footer>
-  <div class="wrap">Jeimy Espinoza Barquero · Universidad Nacional de Costa Rica · II Ciclo 2026. Referencias: ISO/IEC 27001:2022, ISO/IEC 27002:2022, Ley N.° 8968 y su Reglamento (Decreto 37554-JP), documentación de Oracle Database 21c. Datos de laboratorio ficticios.</div>
-</footer>
+<div class="tip" id="tip" hidden></div>
 
 <script>
 const D = {"RIESGOS": [{"id": "R-CONF-01", "n": "Privilegios excesivos y abuso de cuentas privilegiadas", "d": "Usuarios con rol DBA, privilegios ANY o grants directos, cuentas por defecto o compartidas leen datos personales sin necesidad de negocio.", "i": 5, "p": 4, "ri": 5, "rp": 2, "c": ["A.5.15", "A.5.16", "A.5.17", "A.5.18", "A.8.2", "A.8.5"]}, {"id": "R-CONF-02", "n": "Robo de archivos de datos, respaldos o exportaciones sin cifrar", "d": "Copia de archivos .DBF, piezas RMAN o dumps de Data Pump fuera del servidor y lectura directa sin pasar por la base.", "i": 5, "p": 3, "ri": 5, "rp": 1, "c": ["A.8.24", "A.8.13", "A.8.12"]}, {"id": "R-CONF-03", "n": "Exposición de datos personales fuera de su finalidad", "d": "Analistas o entornos DEV/TEST ven cédulas, salarios o tarjetas reales; datos conservados más allá de su plazo.", "i": 4, "p": 4, "ri": 4, "rp": 2, "c": ["A.5.12", "A.8.3", "A.8.10", "A.8.11", "A.8.33"]}, {"id": "R-CONF-04", "n": "Intercepción de tráfico y acceso de red no autorizado", "d": "Credenciales y resultados viajan en claro por Oracle Net; cualquier equipo de la red puede intentar conectarse al listener.", "i": 4, "p": 3, "ri": 4, "rp": 1, "c": ["A.8.20", "A.8.5"]}, {"id": "R-CONF-05", "n": "Accesos indebidos sin trazabilidad", "d": "Sin auditoría, o con registros que se pueden borrar, las lecturas indebidas no se detectan ni se investigan.", "i": 4, "p": 3, "ri": 4, "rp": 1, "c": ["A.8.15", "A.5.33"]}], "TAREAS": [["T-01", "Gestión de usuarios", "Alta nominativa con perfil seguro, bloqueo de cuentas inactivas, esquemas dueños sin inicio de sesión", "Por solicitud · revisión mensual", ["R-CONF-01"], ["A.5.16", "A.5.18"], "03, 04"], ["T-02", "Gestión de privilegios", "Roles por función, sin privilegios directos, separación SYSBACKUP / SYSKM", "Por solicitud · revisión trimestral", ["R-CONF-01"], ["A.5.15", "A.8.2"], "02, 04"], ["T-03", "Autenticación", "Perfil de contraseñas, bloqueo por intentos fallidos, solo verificadores 12C", "Inicial · trimestral", ["R-CONF-01", "R-CONF-04"], ["A.5.17", "A.8.5"], "04, 09"], ["T-04", "Cifrado TDE", "Keystore unificado, llave maestra AES256, tablespace cifrado, rotación de llave", "Inicial · rotación anual", ["R-CONF-02"], ["A.8.24", "A.5.12"], "01, 03"], ["T-05", "Enmascaramiento (Data Redaction) y VPD", "Políticas DBMS_REDACT por columna y DBMS_RLS por fila", "Por cambio de esquema", ["R-CONF-03"], ["A.8.11", "A.8.3"], "05"], ["T-06", "Respaldo cifrado", "RMAN en ARCHIVELOG con cifrado transparente AES256 y RESTORE VALIDATE", "Diario · validación mensual", ["R-CONF-02"], ["A.8.13", "A.8.24"], "10a, 10b"], ["T-07", "Auditoría", "Políticas unificadas sobre datos, cambios de seguridad, exportaciones y logons fallidos", "Continuo · revisión semanal", ["R-CONF-05"], ["A.8.15"], "06"], ["T-08", "Parcheo", "Inventario de versión y parches aplicados, plan de actualización", "Trimestral", ["R-CONF-01", "R-CONF-04"], ["A.8.8"], "20"], ["T-09", "Listener y Oracle Net", "sqlnet.ora con cifrado nativo y checksum obligatorios, lista blanca de IP", "Inicial · por cambio de red", ["R-CONF-04"], ["A.8.20"], "09"], ["T-10", "Eliminación segura", "Supresión a solicitud del titular, purga por plazo, papelera vacía", "Por solicitud · mensual", ["R-CONF-03"], ["A.8.10"], "07"], ["T-11", "Gestión de logs", "Retención de 365 días, purga automática, registros protegidos en AUDSYS", "Diario (job)", ["R-CONF-05"], ["A.5.33", "A.8.15"], "06"], ["T-12", "Clones DEV/TEST", "Copia con enmascaramiento estático; desarrollador sin acceso a producción", "Por refresco de DEV", ["R-CONF-03"], ["A.8.11", "A.8.33", "A.8.12"], "08"]], "CTRL": [{"id": "A.5.12", "n": "Clasificación de la información", "t": "T-04, T-05", "r": "R-CONF-03", "impl": "Catálogo CATALOGO_CLASIFICACION con niveles Público, Interno, Confidencial y Restringido, más etiquetas COMMENT ON COLUMN. Cada columna sensible tiene una protección asignada.", "obs": "Catálogo de clasificación y columnas sensibles sin protección", "crit": "0 columnas CONFIDENCIAL o RESTRINGIDO sin redacción", "pr": "PRB-21", "s": "03, 20", "lv": 3, "res": "8 columnas catalogadas; 0 columnas CONFIDENCIAL/RESTRINGIDO sin redacción; etiquetas en el diccionario.", "n4": "Toda columna sensible clasificada y protegida, con verificación automática programada", "sql": "SELECT c.columna, c.nivel, rc.function_type\nFROM   app_conf.catalogo_clasificacion c\nLEFT   JOIN redaction_columns rc\n       ON rc.object_name = c.tabla\n      AND rc.column_name = c.columna;"}, {"id": "A.5.15", "n": "Control de acceso", "t": "T-02", "r": "R-CONF-01", "impl": "RBAC con 4 roles por función (analista, operador, auditor, DBA junior). Ningún privilegio directo a usuarios; el operador no tiene DELETE.", "obs": "Privilegios otorgados directamente a cuentas de usuario", "crit": "0 filas; las pruebas negativas devuelven ORA-01031", "pr": "PRB-06, PRB-11", "s": "04, 20", "lv": 3, "res": "Cuentas del laboratorio sin privilegios directos; ORA-01031 en PRB-06 y PRB-09. Hallazgo: TLD_USER, PRUEBA y SEMILLEROS (otros proyectos) con privilegios directos.", "n4": "Acceso solo por roles, confirmado por pruebas negativas automatizadas", "sql": "SELECT grantee, privilege\nFROM   dba_sys_privs\nWHERE  grantee IN ('U_ANALISTA','U_OPERADOR',\n                   'U_AUDITOR','U_DBA_JR');"}, {"id": "A.5.16", "n": "Gestión de identidades", "t": "T-01", "r": "R-CONF-01", "impl": "Cuentas nominativas con PERFIL_CONF. Los esquemas dueños de datos se crean con NO AUTHENTICATION. INACTIVE_ACCOUNT_TIME de 90 días.", "obs": "Inventario de cuentas: tipo de autenticación, estado y último acceso", "crit": "APP_CONF y APP_CONF_DEV con autenticación NONE; 0 cuentas abiertas sin uso en 90 días", "pr": "Script 20", "s": "03, 04", "lv": 3, "res": "APP_CONF y APP_CONF_DEV con autenticación NONE; 5 cuentas nominativas con PERFIL_CONF. Hallazgo: PDBADMIN y SEMILLEROS sin uso en más de 90 días.", "n4": "Altas y bajas ligadas a un procedimiento formal con revisión registrada", "sql": "SELECT username, authentication_type,\n       account_status, last_login\nFROM   dba_users\nWHERE  oracle_maintained = 'N';"}, {"id": "A.5.17", "n": "Información de autenticación", "t": "T-03", "r": "R-CONF-01", "impl": "PERFIL_CONF: complejidad ORA12C_STRONG_VERIFY_FUNCTION, vigencia de 90 días, historial de 5 contraseñas, bloqueo a los 3 intentos.", "obs": "Política de contraseñas y cuentas con contraseña por defecto", "crit": "Función de complejidad activa; 0 cuentas abiertas con contraseña por defecto", "pr": "PRB-13", "s": "04, 20", "lv": 3, "res": "PERFIL_CONF con 9 reglas y ORA12C_STRONG_VERIFY_FUNCTION; 0 cuentas abiertas con contraseña por defecto.", "n4": "Política aplicada a todas las cuentas, incluidas las comunes, y revisada cada trimestre", "sql": "SELECT resource_name, limit\nFROM   dba_profiles\nWHERE  profile = 'PERFIL_CONF'\nAND    resource_type = 'PASSWORD';\n\nSELECT username FROM dba_users_with_defpwd;"}, {"id": "A.5.18", "n": "Derechos de acceso", "t": "T-01, T-02", "r": "R-CONF-01", "impl": "Revisión de privilegios efectivos con consulta jerárquica sobre toda la cadena de roles heredados.", "obs": "Mapa usuario → roles heredados", "crit": "Cada usuario solo con el rol de su función y sin ADMIN OPTION", "pr": "Script 20", "s": "20", "lv": 3, "res": "Cada usuario del laboratorio hereda solo el rol de su función, sin ADMIN OPTION.", "n4": "Revisión periódica programada con aprobación del responsable del dato", "sql": "SELECT CONNECT_BY_ROOT grantee AS usuario,\n       granted_role\nFROM   dba_role_privs\nSTART  WITH grantee IN (SELECT username\n                        FROM dba_users\n                        WHERE oracle_maintained = 'N')\nCONNECT BY PRIOR granted_role = grantee;"}, {"id": "A.5.33", "n": "Protección de registros", "t": "T-11", "r": "R-CONF-05", "impl": "Auditoría unificada en AUDSYS, protegida contra DML. Retención móvil de 365 días con DBMS_AUDIT_MGMT y un job diario. Solo AUDIT_ADMIN puede purgar.", "obs": "Job de purga, marca de retención y quién administra la auditoría", "crit": "Job ENABLED; marca ≈ hoy − 365 días; borrado manual rechazado", "pr": "PRB-07, PRB-15", "s": "06, 20", "lv": 4, "res": "PURGA_AUDIT_CONF ENABLED; marca 21/10/2025 (365 días); DELETE sobre la auditoría rechazado con ORA-01031.", "n4": "Retención automatizada y verificada; registros que ningún usuario puede alterar", "sql": "SELECT job_name, job_status\nFROM   dba_audit_mgmt_cleanup_jobs;\n\nSELECT audit_trail, last_archive_ts\nFROM   dba_audit_mgmt_last_arch_ts;"}, {"id": "A.8.2", "n": "Derechos de acceso privilegiado", "t": "T-02", "r": "R-CONF-01", "impl": "Separación de funciones: SYSBACKUP para respaldos (C##BACKUP_OP) y SYSKM para llaves (C##KEY_ADMIN). Rol DBA solo en SYS y SYSTEM. El DBA junior no tiene privilegios ANY.", "obs": "Cuentas con privilegios administrativos y con rol DBA", "crit": "SYSDBA solo en SYS; 0 usuarios de aplicación con DBA o ANY", "pr": "PRB-12", "s": "02, 04, 20", "lv": 3, "res": "SYSDBA solo en SYS; C##BACKUP_OP solo SYSBACKUP; C##KEY_ADMIN solo SYSKM; ninguna cuenta de aplicación con DBA ni ANY.", "n4": "Uso de privilegios administrativos auditado y otorgado solo cuando se necesita", "sql": "SELECT username, sysdba, sysbackup, syskm\nFROM   v$pwfile_users;\n\nSELECT grantee FROM dba_role_privs\nWHERE  granted_role = 'DBA';"}, {"id": "A.8.3", "n": "Restricción del acceso a la información", "t": "T-05", "r": "R-CONF-03", "impl": "Virtual Private Database (DBMS_RLS): el analista solo ve clientes de HEREDIA en SELECT, INSERT, UPDATE y DELETE.", "obs": "Políticas de filas activas y usuarios exentos de ellas", "crit": "POL_VPD_CLIENTES habilitada; el analista ve solo HEREDIA", "pr": "PRB-05", "s": "05, 20", "lv": 3, "res": "POL_VPD_CLIENTES activa en SEL/INS/UPD/DEL; el analista ve 16 clientes, todos de HEREDIA.", "n4": "Filtro por contexto de aplicación en lugar de nombre de usuario, con prueba automatizada", "sql": "SELECT policy_name, function,\n       sel, ins, upd, del, enable\nFROM   dba_policies\nWHERE  object_owner = 'APP_CONF';"}, {"id": "A.8.5", "n": "Autenticación segura", "t": "T-03, T-09", "r": "R-CONF-01", "impl": "Bloqueo de 1 hora tras 3 intentos, solo verificadores 12C (SQLNET.ALLOWED_LOGON_VERSION_SERVER = 12a) e intentos fallidos auditados.", "obs": "Versiones de contraseña y bloqueo por intentos", "crit": "Solo 12C; el cuarto intento devuelve ORA-28000", "pr": "PRB-10", "s": "04, 09, 21", "lv": 4, "res": "Cuentas del laboratorio solo 12C; ORA-01017 ×3 y ORA-28000; los 4 intentos quedan auditados. Hallazgo: cuentas de otros proyectos con 11G.", "n4": "Bloqueo probado y cada intento fallido registrado en auditoría", "sql": "SELECT username, password_versions\nFROM   dba_users\nWHERE  oracle_maintained = 'N';"}, {"id": "A.8.10", "n": "Eliminación de información", "t": "T-10", "r": "R-CONF-03", "impl": "Supresión del titular por procedimiento (el operador no tiene DELETE), purga por plazo de 5 años, registro con hash SHA-256 y papelera purgada. El residuo queda en un tablespace cifrado.", "obs": "Bitácora de supresiones y papelera de reciclaje", "crit": "Papelera vacía; 0 clientes fuera de plazo; supresiones registradas con hash", "pr": "PRB-09", "s": "07, 20", "lv": 3, "res": "Papelera vacía; 1 purga por retención y 2 supresiones del titular registradas con hash SHA-256; 0 clientes fuera de plazo.", "n4": "Purga programada y procedimiento formal de atención de solicitudes (Ley 8968)", "sql": "SELECT tipo, COUNT(*)\nFROM   app_conf.registro_supresiones\nGROUP  BY tipo;\n\nSELECT COUNT(*) FROM dba_recyclebin\nWHERE  owner = 'APP_CONF';"}, {"id": "A.8.11", "n": "Enmascaramiento de datos", "t": "T-05, T-12", "r": "R-CONF-03", "impl": "Data Redaction (DBMS_REDACT): cédula, teléfono y tarjeta en forma parcial, salario total y correo por expresión regular. Quedan exentos el operador (por rol) y los procedimientos del esquema dueño. DEV usa enmascaramiento estático.", "obs": "Columnas con redacción y tipo de función aplicada", "crit": "5 columnas redactadas; el analista ve la cédula como *****0456", "pr": "PRB-04, PRB-08", "s": "05, 08, 20", "lv": 4, "res": "5 columnas redactadas; el analista ve *****0456 y salario 0, el operador ve los datos reales.", "n4": "Redacción probada con usuarios con y sin rol, y DEV sin datos reales", "sql": "SELECT column_name, function_type,\n       function_parameters\nFROM   redaction_columns\nWHERE  object_owner = 'APP_CONF';"}, {"id": "A.8.12", "n": "Prevención de fuga de datos", "t": "T-02, T-06, T-12", "r": "R-CONF-02", "impl": "Exportaciones con Data Pump auditadas. Ninguna cuenta de aplicación tiene EXEMPT REDACTION POLICY ni exportación completa. El analista no puede crear tablas. Respaldos cifrados.", "obs": "Privilegios de exención y paquetes de salida de red otorgados a PUBLIC", "crit": "Exenciones solo en roles de Oracle; exportaciones auditadas", "pr": "PRB-06b, PRB-22, PRB-24", "s": "06, 08, 20", "lv": 2, "res": "Copia de datos bloqueada con ORA-28081; exportaciones auditadas. Hallazgo: PUBLIC conserva EXECUTE sobre UTL_FILE, UTL_HTTP, UTL_TCP, UTL_SMTP, UTL_INADDR y DBMS_LDAP.", "n4": "PUBLIC sin UTL_*; exportaciones bloqueadas salvo cuenta autorizada y con alerta", "sql": "SELECT grantee, privilege FROM dba_sys_privs\nWHERE  privilege IN ('EXEMPT REDACTION POLICY',\n                    'EXEMPT ACCESS POLICY');\n\nSELECT table_name FROM dba_tab_privs\nWHERE  grantee = 'PUBLIC'\nAND    table_name IN ('UTL_FILE','UTL_HTTP',\n                      'UTL_TCP','UTL_SMTP');"}, {"id": "A.8.13", "n": "Copias de seguridad de la información", "t": "T-06", "r": "R-CONF-02", "impl": "RMAN en ARCHIVELOG con cifrado transparente AES256 (llave TDE), autobackup del controlfile, redundancia 2 y RESTORE DATABASE VALIDATE.", "obs": "Piezas de respaldo cifradas y configuración de RMAN", "crit": "ENCRYPTED = YES en todas las piezas; VALIDATE sin errores", "pr": "PRB-16, PRB-17", "s": "10a, 10b, 20", "lv": 3, "res": "ARCHIVELOG; ENCRYPTION FOR DATABASE ON (AES256); 5 piezas de hoy cifradas; RESTORE VALIDATE sin errores. Hallazgo: piezas del 14/10 y autobackup de 12:13 sin cifrar.", "n4": "Respaldo programado, copia fuera del equipo y restauración de prueba periódica", "sql": "SELECT encrypted, COUNT(*)\nFROM   v$backup_piece\nGROUP  BY encrypted;\n\nSELECT name, value\nFROM   v$rman_configuration;"}, {"id": "A.8.15", "n": "Registro (logging)", "t": "T-07, T-11", "r": "R-CONF-05", "impl": "Políticas unificadas sobre acceso a CLIENTES, cambios de seguridad, exportaciones y logons fallidos.", "obs": "Políticas activas y eventos de acceso a datos confidenciales", "crit": "Los eventos de las pruebas aparecen con usuario, acción y código de retorno", "pr": "PRB-14", "s": "06, 20, 21", "lv": 3, "res": "6 políticas activas; lecturas, rechazos (2004, 28081) y logons fallidos (1017, 28000) registrados con usuario y hora.", "n4": "Eventos enviados a un SIEM con alertas y revisión periódica", "sql": "SELECT policy_name, enabled_option\nFROM   audit_unified_enabled_policies;\n\nSELECT dbusername, action_name, return_code\nFROM   unified_audit_trail\nWHERE  object_schema = 'APP_CONF';"}, {"id": "A.8.20", "n": "Seguridad de redes", "t": "T-09", "r": "R-CONF-04", "impl": "sqlnet.ora con cifrado nativo AES256 y checksum SHA256 en modo REQUIRED, lista blanca TCP.INVITED_NODES y SQLNET.EXPIRE_TIME. Equivale al pg_hba.conf de PostgreSQL.", "obs": "Cifrado de la sesión TCP y lista de equipos admitidos", "crit": "Banner AES256 y SHA256; una IP no invitada es rechazada", "pr": "PRB-18, PRB-19", "s": "09, 20, 21", "lv": 3, "res": "Sesión TCP con AES256 y SHA256 desde 127.0.0.1; TCP.INVITED_NODES activo.", "n4": "TLS con certificados y monitoreo del listener.log", "sql": "SELECT network_service_banner\nFROM   v$session_connect_info\nWHERE  sid = SYS_CONTEXT('USERENV','SID');"}, {"id": "A.8.24", "n": "Uso de criptografía", "t": "T-04, T-06", "r": "R-CONF-02", "impl": "Keystore TDE unificado con auto-login (WALLET_ROOT), llave maestra, tablespace TS_CONF_ENC cifrado en AES256 y llave administrada por SYSKM.", "obs": "Estado del keystore y tablespaces cifrados", "crit": "Keystore OPEN / AUTOLOGIN; TS_CONF_ENC cifrado; sin texto legible en el datafile", "pr": "PRB-01, PRB-02, PRB-03", "s": "01, 03, 20", "lv": 3, "res": "Keystore OPEN/AUTOLOGIN en CDB, PDB$SEED y XEPDB1; TS_CONF_ENC cifrado AES256 con las 3 tablas de APP_CONF.", "n4": "Rotación anual de la llave maestra y respaldo del keystore fuera del servidor", "comp": true, "sql": "SELECT con_id, status, wallet_type\nFROM   v$encryption_wallet;\n\nSELECT tablespace_name, encrypted\nFROM   dba_tablespaces;"}, {"id": "A.8.8", "n": "Gestión de vulnerabilidades técnicas", "t": "T-08", "r": "R-CONF-01", "impl": "Inventario de versión y parches. XE no recibe Release Updates: se documenta como riesgo aceptado con plan de migración a Oracle Database Free.", "obs": "Versión instalada y parches registrados", "crit": "Versión documentada; sin RU disponibles queda Parcial", "pr": "PRB-23", "s": "20", "lv": 2, "res": "Oracle 21.3.0.0.0 XE sin parches registrados en dba_registry_sqlpatch.", "n4": "Release Updates trimestrales aplicadas y verificadas", "comp": true, "sql": "SELECT banner_full FROM v$version;\n\nSELECT patch_id, status\nFROM   dba_registry_sqlpatch;"}, {"id": "A.8.33", "n": "Información de prueba", "t": "T-12", "r": "R-CONF-03", "impl": "Esquema APP_CONF_DEV con datos sintéticos derivados de producción; el desarrollador no tiene acceso a producción.", "obs": "Coincidencias de datos reales en DEV", "crit": "0 coincidencias en cédula, nombre, correo y tarjeta", "pr": "PRB-20", "s": "08, 20, 21", "lv": 3, "res": "0 coincidencias de cédula, nombre, correo y tarjeta entre DEV y producción; el desarrollador recibe ORA-00942 en producción.", "n4": "Refresco de DEV automatizado con enmascaramiento integrado", "comp": true, "sql": "SELECT COUNT(*)\nFROM   app_conf_dev.clientes d\nJOIN   app_conf.clientes p\n       ON d.cedula = p.cedula;"}], "PRUEBAS": [["PRB-01", "Configuracion", "A.8.24", "Consultar v$encryption_wallet en CDB$ROOT.", "STATUS = OPEN y WALLET_TYPE = AUTOLOGIN en CDB y XEPDB1", "SQL Developer"], ["PRB-02", "Configuracion", "A.8.24", "Consultar v$encrypted_tablespaces en XEPDB1.", "TS_CONF_ENC con ENCRYPTIONALG = AES256", "SQL Developer"], ["PRB-03", "Negativa", "A.8.24", "ALTER SYSTEM CHECKPOINT; SHUTDOWN IMMEDIATE; en PowerShell: Select-String -Path TS_CONF_ENC01.DBF -Pattern \"Zuleyka\" -SimpleMatch; luego STARTUP.", "0 coincidencias: el texto no es legible en el archivo", "SQL*Plus + PowerShell"], ["PRB-04", "Funcional", "A.8.11", "Como U_ANALISTA: SELECT de cédula, correo, teléfono, salario y tarjeta.", "Cédula *****NNNN, salario 0, tarjeta ************NNNN, correo enmascarado", "SQL*Plus (script 21)"], ["PRB-05", "Funcional", "A.8.3", "Como U_ANALISTA: conteo de clientes por provincia.", "Una sola fila: HEREDIA", "SQL*Plus (script 21)"], ["PRB-06", "Negativa", "A.5.15", "Como U_ANALISTA: UPDATE sobre CLIENTES.", "ORA-01031: privilegios insuficientes", "SQL*Plus (script 21)"], ["PRB-06b", "Negativa", "A.8.12", "Como U_ANALISTA: CREATE TABLE … AS SELECT de CLIENTES.", "Rechazo con ORA-28081: Data Redaction impide copiar columnas ocultas (o ORA-01031)", "SQL*Plus (script 21)"], ["PRB-07", "Negativa", "A.5.33", "Como U_ANALISTA: SELECT de UNIFIED_AUDIT_TRAIL. Como U_AUDITOR: DELETE de UNIFIED_AUDIT_TRAIL.", "ORA-00942 para el analista; error de privilegio o vista de solo lectura para el auditor", "SQL*Plus (script 21)"], ["PRB-08", "Funcional", "A.8.11", "Como U_OPERADOR: SELECT y UPDATE del cliente 901230456.", "Datos completos sin enmascarar; 1 fila actualizada", "SQL*Plus (script 21)"], ["PRB-09", "Negativa", "A.8.10", "Como U_OPERADOR: DELETE directo; luego EXEC prc_suprimir_titular.", "DELETE rechazado con ORA-01031; el procedimiento suprime y registra el hash", "SQL*Plus (script 21)"], ["PRB-10", "Negativa", "A.8.5", "Tres conexiones de U_ANALISTA con contraseña errónea y una cuarta con la correcta.", "ORA-01017 tres veces y ORA-28000 (cuenta bloqueada)", "SQL*Plus (script 21)"], ["PRB-11", "Revision", "A.5.15", "Listar privilegios de sistema y de objeto otorgados directamente a usuarios.", "0 filas", "Script 20"], ["PRB-12", "Revision", "A.8.2", "Revisar v$pwfile_users y los usuarios con rol DBA.", "SYSDBA solo en SYS; SYSBACKUP y SYSKM en sus cuentas dedicadas", "Script 20"], ["PRB-13", "Revision", "A.5.17", "Cruzar dba_users_with_defpwd con cuentas abiertas.", "0 cuentas abiertas con contraseña por defecto", "Script 20"], ["PRB-14", "Funcional", "A.8.15", "Como U_AUDITOR: consultar UNIFIED_AUDIT_TRAIL de los últimos 30 minutos.", "SELECT y UPDATE sobre CLIENTES, logons fallidos y ALTER USER del desbloqueo", "SQL*Plus (script 21)"], ["PRB-15", "Configuracion", "A.5.33", "Revisar el job de purga, la marca de archivo y el job de retención.", "Jobs habilitados; marca ≈ hoy − 365 días", "Script 20"], ["PRB-16", "Configuracion", "A.8.13", "Consultar v$backup_piece después del respaldo RMAN.", "ENCRYPTED = YES en todas las piezas disponibles", "RMAN + SQL Developer"], ["PRB-17", "Funcional", "A.8.13", "RESTORE DATABASE VALIDATE en RMAN.", "Finaliza sin errores: el respaldo cifrado es restaurable", "RMAN"], ["PRB-18", "Configuracion", "A.8.20", "Por TCP, consultar v$session_connect_info de la propia sesión.", "AES256 Encryption service adapter y SHA256 Crypto-checksumming", "SQL*Plus (script 21)"], ["PRB-19", "Negativa", "A.8.20", "Conectar al puerto 1521 desde una IP fuera de TCP.INVITED_NODES (otra PC o WSL).", "Conexión rechazada; el rechazo queda en listener.log", "SQL Developer / PowerShell"], ["PRB-20", "Funcional", "A.8.33", "Como U_DESARROLLADOR: consultar PROD y DEV; cruzar DEV con PROD.", "ORA-00942 en PROD; 0 coincidencias de datos reales en DEV", "SQL*Plus (scripts 20 y 21)"], ["PRB-21", "Revision", "A.5.12", "Cruzar el catálogo de clasificación con redaction_columns.", "0 columnas CONFIDENCIAL o RESTRINGIDO sin redacción", "Script 20"], ["PRB-22", "Revision", "A.8.12", "Listar titulares de EXEMPT REDACTION/ACCESS POLICY y paquetes UTL_* en PUBLIC.", "Exenciones solo en roles de Oracle; UTL_* en PUBLIC se reporta como hallazgo", "Script 20"], ["PRB-23", "Revision", "A.8.8", "Consultar v$version y dba_registry_sqlpatch.", "Versión 21c XE sin Release Updates: hallazgo Parcial", "Script 20"], ["PRB-24", "Funcional", "A.8.12", "Ejecutar expdp del esquema APP_CONF_DEV y consultar UNIFIED_AUDIT_TRAIL con AUDIT_TYPE = 'Datapump'.", "La exportación aparece auditada con usuario y hora", "PowerShell + SQL Developer"]], "SCRIPTS": [["01_cdb_tde_keystore.sql", "Keystore TDE, llave maestra y auto-login. Reinicia la base."], ["02_cdb_separacion_funciones.sql", "Cuentas comunes con SYSBACKUP y SYSKM."], ["03_pdb_esquema_clasificacion.sql", "Tablespace cifrado, esquema sin login, catálogo de clasificación y datos de prueba."], ["04_pdb_usuarios_roles_perfiles.sql", "Perfil de contraseñas, roles por función y cuentas nominativas."], ["05_pdb_redaction_vpd.sql", "Data Redaction de 5 columnas y política VPD por provincia."], ["06_pdb_auditoria_retencion.sql", "Políticas de auditoría unificada y retención de 365 días."], ["07_pdb_eliminacion_segura.sql", "Supresión del titular, purga por plazo y bitácora con hash."], ["08_pdb_entorno_dev_enmascarado.sql", "Esquema DEV con datos sintéticos y desarrollador aislado."], ["09_red_sqlnet_ora.plantilla", "Cifrado de red y lista blanca de IP en sqlnet.ora."], ["10a_habilitar_archivelog.sql", "Activa ARCHIVELOG. Reinicia la base."], ["10b_backup_cifrado.rman", "Respaldo RMAN cifrado AES256 y RESTORE VALIDATE."], ["21_pruebas_funcionales.sql", "Pruebas positivas y negativas por usuario. Genera evidencia_pruebas.txt."], ["20_verificacion_controles.sql", "Verificación de los 15 + 3 controles. Genera evidencia_controles.txt."], ["99_rollback.sql", "Deshace los scripts 02 a 08 para repetir el laboratorio."]], "MEJORA": [["A.8.12", "PUBLIC conserva EXECUTE sobre UTL_FILE, UTL_HTTP, UTL_TCP, UTL_SMTP, UTL_INADDR y DBMS_LDAP", "Revocar a PUBLIC en CDB$ROOT tras validar dependencias y otorgar solo a cuentas que lo justifiquen; alerta ante exportaciones", "DBA", 3], ["A.5.15", "TLD_USER, PRUEBA y SEMILLEROS (otros proyectos en la misma PDB) tienen privilegios directos y perfil DEFAULT", "Pasar sus privilegios a roles por proyecto y asignarles PERFIL_CONF, coordinando con cada proyecto", "DBA", 4], ["A.5.16", "PDBADMIN y SEMILLEROS sin uso en más de 90 días", "Confirmar con el responsable y bloquear (ACCOUNT LOCK) las cuentas que no se usen", "DBA", 4], ["A.8.5", "Cuentas de otros proyectos conservan verificadores 11G", "Regenerar sus contraseñas ahora que el servidor solo acepta 12C (SQLNET.ALLOWED_LOGON_VERSION_SERVER = 12a)", "DBA", 4], ["A.8.13", "Respaldos del 14/10 y autobackup de 12:13 sin cifrar; respaldo manual", "Eliminar o reemplazar las piezas sin cifrar, programar RMAN y copiar las piezas fuera del equipo", "C##BACKUP_OP", 4], ["A.8.8", "XE no recibe Release Updates (21.3.0.0.0 sin parches)", "Migrar a Oracle Database Free o a una edición con soporte; mientras tanto, aislar la red", "DBA / Infraestructura", 3], ["A.8.10", "La purga por plazo se ejecuta a mano", "Programar PRC_PURGAR_INACTIVOS con DBMS_SCHEDULER y formalizar la atención de solicitudes (Ley 8968)", "DBA", 4], ["A.8.15", "Sin correlación de eventos", "Exportar UNIFIED_AUDIT_TRAIL a un SIEM y definir alertas por lecturas masivas o rechazos repetidos", "Seguridad", 4], ["A.8.20", "Cifrado nativo en lugar de TLS con certificados; PRB-19 no ejecutada", "Configurar TCPS con certificados y probar el rechazo desde una IP no invitada", "DBA", 4], ["A.8.24", "Sin rotación de llave programada", "Rotar la llave maestra cada año (SET KEY … WITH BACKUP) y resguardar el keystore fuera del servidor", "C##KEY_ADMIN", 4]], "RESULT": {"PRB-01": "Conforme", "PRB-02": "Conforme", "PRB-03": "Pendiente", "PRB-04": "Conforme", "PRB-05": "Conforme", "PRB-06": "Conforme", "PRB-06b": "Conforme", "PRB-07": "Conforme", "PRB-08": "Conforme", "PRB-09": "Conforme", "PRB-10": "Conforme", "PRB-11": "Conforme", "PRB-12": "Conforme", "PRB-13": "Conforme", "PRB-14": "Conforme", "PRB-15": "Conforme", "PRB-16": "Conforme", "PRB-17": "Conforme", "PRB-18": "Conforme", "PRB-19": "Pendiente", "PRB-20": "Conforme", "PRB-21": "Conforme", "PRB-22": "Conforme", "PRB-23": "Conforme", "PRB-24": "Pendiente"}};
@@ -276,57 +352,113 @@ const band = v => v >= 16 ? 4 : v >= 10 ? 3 : v >= 5 ? 2 : 1;
 const bandTxt = ["","Bajo","Medio","Alto","Crítico"], bandCls = ["","p-ok","p-warn","p-hi","p-bad"];
 const estado = v => v >= 3 ? ["Cumple","p-ok"] : v === 2 ? ["Parcial","p-warn"] : ["No cumple","p-bad"];
 const meter = v => `<span class="meter l${v}">${[1,2,3,4].map(i => `<i class="${i <= v ? "on" : ""}"></i>`).join("")}</span>`;
-
-/* pestañas */
-const TABS = [["resumen","Resumen"],["riesgos","Riesgos",D.RIESGOS.length],["tareas","Tareas DBA",D.TAREAS.length],["mapeo","Mapeo ISO",D.CTRL.length],["observables","Observables",15],["matriz","Matriz",D.CTRL.length],["pruebas","Pruebas",D.PRUEBAS.length],["mejora","Plan de mejora",D.MEJORA.length],["scripts","Scripts",D.SCRIPTS.length]];
-$("#tablist").innerHTML = TABS.map(([id,t,n]) => `<button type="button" role="tab" id="tab-${id}" aria-controls="${id}" aria-selected="false">${t}${n ? `<span class="n">${n}</span>` : ""}</button>`).join("");
+const IC = {
+  resumen:'<path d="M4 13h6V4H4zM14 20h6v-9h-6zM4 20h6v-4H4zM14 7h6V4h-6z"/>',
+  riesgos:'<path d="M12 4l9 16H3z"/><path d="M12 10v4M12 17h.01"/>',
+  tareas:'<path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/>',
+  mapeo:'<path d="M4 6h6v5H4zM14 13h6v5h-6z"/><path d="M10 8.5h3a1 1 0 011 1V13"/>',
+  scripts:'<path d="M5 4h14v16H5z"/><path d="M9 9l-2 2 2 2M13 13h3"/>',
+  observables:'<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  matriz:'<path d="M4 4h16v16H4zM4 10h16M10 4v16"/>',
+  pruebas:'<path d="M9 3h6M10 3v6l-5 9a2 2 0 002 3h10a2 2 0 002-3l-5-9V3"/>',
+  mejora:'<path d="M4 16l5-5 4 4 7-7"/><path d="M15 8h5v5"/>'
+};
+const PAGES = [
+  {id:"resumen", g:null, t:"Resumen", h:"Panel general", d:"Resultados de la evaluación de controles de confidencialidad en el laboratorio Oracle 21c XE."},
+  {id:"riesgos", g:"P", t:"Riesgos", n:D.RIESGOS.length, h:"Riesgos de confidencialidad", d:"Cinco riesgos R-CONF con impacto, probabilidad y riesgo residual tras aplicar los controles."},
+  {id:"tareas", g:"P", t:"Tareas del DBA", n:D.TAREAS.length, h:"Tareas críticas del DBA", d:"Las 12 tareas del enunciado con su frecuencia, riesgos, controles y script de implementación."},
+  {id:"mapeo", g:"P", t:"Mapeo ISO", n:D.CTRL.length, h:"Mapeo de controles ISO/IEC 27001:2022", d:"Implementación de cada control en Oracle 21c XE y la consulta que un auditor ejecuta para obtener la evidencia."},
+  {id:"scripts", g:"H", t:"Scripts", n:D.SCRIPTS.length, h:"Scripts de implementación y verificación", d:"Orden de ejecución. Los scripts 21 y 20 generan los archivos de evidencia que respaldan la matriz."},
+  {id:"observables", g:"V", t:"Observables", n:15, h:"15 controles observables por un auditor externo", d:"Qué puede comprobar un auditor sin depender de la palabra del DBA, y con qué criterio lo acepta."},
+  {id:"matriz", g:"V", t:"Matriz", n:D.CTRL.length, h:"Matriz de evaluación", d:"Niveles asignados con la evidencia real obtenida el 21 de octubre de 2026."},
+  {id:"pruebas", g:"V", t:"Pruebas", n:D.PRUEBAS.length, h:"Batería de pruebas", d:"Pruebas de configuración, funcionales, negativas y de revisión ejecutadas sobre Oracle 21c XE."},
+  {id:"mejora", g:"A", t:"Plan de mejora", n:D.MEJORA.length, h:"Hallazgos y plan de mejora", d:"Brechas encontradas por la verificación y la acción propuesta para cerrar cada una."}
+];
+const FASE = {P:"Planificar", H:"Hacer", V:"Verificar", A:"Actuar"};
+let lastG; $("#side").innerHTML = PAGES.map(p => {
+  let s = "";
+  if (p.g && p.g !== lastG) { s += `<div class="grp"><i>${p.g}</i>${FASE[p.g]}</div>`; lastG = p.g; }
+  return s + `<button type="button" data-p="${p.id}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${IC[p.id]}</svg>${p.t}${p.n ? `<span class="n">${p.n}</span>` : ""}</button>`;
+}).join("");
 function show(id, push){
-  if (!TABS.some(t => t[0] === id)) id = "resumen";
-  TABS.forEach(([t]) => { $("#" + t).hidden = t !== id; $("#tab-" + t).setAttribute("aria-selected", t === id); });
-  $("#tab-" + id).scrollIntoView({block:"nearest", inline:"nearest"});
-  if (push) { try { history.replaceState(null, "", "#" + id); } catch(e) {} window.scrollTo({top:0}); }
+  const p = PAGES.find(x => x.id === id) || PAGES[0];
+  PAGES.forEach(x => { $("#" + x.id).hidden = x.id !== p.id; });
+  document.querySelectorAll("#side button").forEach(b => { if (b.dataset.p === p.id) { b.setAttribute("aria-current","page"); b.scrollIntoView({block:"nearest",inline:"nearest"}); } else b.removeAttribute("aria-current"); });
+  $("#crumb-fase").textContent = p.g ? FASE[p.g] : "Resumen";
+  $("#crumb-t").textContent = p.id === "resumen" ? "Panel general" : p.t;
+  $("#ph-t").textContent = p.id === "resumen" ? "Controles para Riesgos de Confidencialidad Tareas del administrador de Bases de Datos" : p.h;
+  $("#ph-d").textContent = p.d;
+  if (push) { try { history.replaceState(null, "", "#" + p.id); } catch(e) {} window.scrollTo({top:0}); }
 }
-$("#tablist").addEventListener("click", e => { const b = e.target.closest("button"); if (b) show(b.id.slice(4), true); });
-$("#tablist").addEventListener("keydown", e => {
-  if (!["ArrowRight","ArrowLeft"].includes(e.key)) return;
-  const btns = [...document.querySelectorAll("#tablist button")]; const i = btns.indexOf(document.activeElement);
-  const n = btns[(i + (e.key === "ArrowRight" ? 1 : -1) + btns.length) % btns.length]; n.focus(); show(n.id.slice(4), true);
-});
+$("#side").addEventListener("click", e => { const b = e.target.closest("button[data-p]"); if (b) show(b.dataset.p, true); });
 document.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => show(b.dataset.go, true)));
 
+/* tooltip */
+const tip = $("#tip");
+function tipShow(e, html){ tip.innerHTML = html; tip.hidden = false; const x = Math.min(e.clientX + 14, innerWidth - tip.offsetWidth - 10), y = Math.min(e.clientY + 14, innerHeight - tip.offsetHeight - 10); tip.style.left = x + "px"; tip.style.top = y + "px"; }
+function tipHide(){ tip.hidden = true; }
+
 /* resumen */
-const ok = D.CTRL.filter(c => c.lv >= 3).length, pa = D.CTRL.filter(c => c.lv === 2).length, no = D.CTRL.filter(c => c.lv < 2).length;
+const ok = D.CTRL.filter(c => c.lv >= 3).length, pa = D.CTRL.filter(c => c.lv === 2).length;
+const lv4 = D.CTRL.filter(c => c.lv === 4).length;
 const avg = (D.CTRL.reduce((s,c) => s + c.lv, 0) / D.CTRL.length).toFixed(1).replace(".", ",");
 const conf = Object.values(D.RESULT).filter(r => r === "Conforme").length;
+(() => { const r = 54, C = 2 * Math.PI * r, f = ok / D.CTRL.length;
+  $("#ring").innerHTML = `<svg viewBox="0 0 132 132"><circle cx="66" cy="66" r="${r}" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="12"/><circle cx="66" cy="66" r="${r}" fill="none" stroke="#7FD4A4" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C*f - 4} ${C}"/></svg><div class="c"><div><b>${ok}/${D.CTRL.length}</b><span>controles cumplen</span></div></div>`; })();
 $("#kpis").innerHTML = [
-  ["", D.CTRL.length, "controles evaluados (15 + 3 complementarios)"],
-  ["ok", ok, "cumplen"], ["warn", pa, "en estado parcial"],
-  ["", avg, "madurez media de 4"], ["ok", `${conf}/${D.PRUEBAS.length}`, "pruebas conformes"]
-].map(([c,v,k]) => `<div class="kpi ${c}"><div class="v">${v}</div><div class="k">${k}</div></div>`).join("");
-const n = D.CTRL.length;
-$("#bar").innerHTML = `<i style="width:${ok/n*100}%;background:var(--ok)"></i><i style="width:${pa/n*100}%;background:#D49A1C"></i><i style="width:${no/n*100}%;background:var(--bad)"></i>`;
+  ["Controles evaluados", D.CTRL.length, "15 del enunciado y 3 complementarios", ""],
+  ["Madurez media", `${avg}<span style="font-size:15px;color:var(--muted);font-weight:500"> / 4</span>`, `${lv4} controles en nivel 4`, ""],
+  ["Pruebas conformes", `${conf}<span style="font-size:15px;color:var(--muted);font-weight:500"> / ${D.PRUEBAS.length}</span>`, "3 pendientes por ejecutar", ""],
+  ["Hallazgos", D.MEJORA.length, `${pa} controles en estado parcial`, `<span class="badge p-warn">A.8.12 · A.8.8</span>`]
+].map(([t,v,s,b]) => `<div class="card kpi"><div class="t">${t}</div><div class="v">${v}</div><div class="s">${s}</div>${b}</div>`).join("");
+
+/* gráfico de madurez */
+(() => {
+  const rows = [...D.CTRL].sort((a,b) => b.lv - a.lv || a.id.localeCompare(b.id, "es", {numeric:true}));
+  const gl = [0,1,2,3,4].map(v => `<i class="gl" style="left:${v*25}%"></i>`).join("");
+  $("#mchart").innerHTML = rows.map((c,i) => `<div class="mrow" tabindex="0" data-i="${D.CTRL.indexOf(c)}">
+      <div class="lab"><span class="mono">${c.id}</span><span class="nm">${esc(c.n)}</span></div>
+      <div class="track">${gl}<i class="b" style="width:${c.lv*25}%;background:${c.lv >= 3 ? "var(--ok-bar)" : c.lv === 2 ? "var(--warn-bar)" : "var(--bad)"}"></i></div>
+      <div class="val">${c.lv}</div></div>`).join("") +
+    `<div class="maxis"><div></div><div class="t">${[0,1,2,3,4].map(v => `<span style="left:${v*25}%">${v}</span>`).join("")}</div><div></div></div>`;
+  const h = e => { const r = e.target.closest(".mrow"); if (!r) return tipHide(); const c = D.CTRL[+r.dataset.i]; const [t] = estado(c.lv);
+    tipShow(e, `<b>${c.id} · ${esc(c.n)}</b>Nivel ${c.lv} · ${t}<br>${esc(c.res)}`); };
+  $("#mchart").addEventListener("mousemove", h); $("#mchart").addEventListener("mouseleave", tipHide);
+})();
+
+/* dumbbell */
+(() => {
+  const X = v => (v / 25) * 100;
+  const zones = [[0,"0"],[4.5,""],[9.5,""],[15.5,""],[25,"25"]];
+  const zl = `<div class="dzones"><div></div><div class="z"><span style="left:${X(2.5)}%">Bajo</span><span style="left:${X(7)}%">Medio</span><span style="left:${X(12.5)}%">Alto</span><span style="left:${X(20.5)}%">Crítico</span></div></div>`;
+  const zlines = [4.5,9.5,15.5].map(v => `<i class="zone" style="left:${X(v)}%"></i>`).join("");
+  $("#dchart").innerHTML = `<div class="dchart">${zl}` + D.RIESGOS.map((r,k) => { const a = r.i*r.p, b = r.ri*r.rp;
+    return `<div class="drow" data-k="${k}"><div class="lab">${r.id}</div><div class="dtrack">${zlines}
+      <i class="ln" style="left:${X(b)}%;width:${X(a)-X(b)}%"></i>
+      <i class="pt" style="left:${X(b)}%;background:var(--s-res)"></i><i class="pt" style="left:${X(a)}%;background:var(--s-inh)"></i>
+      <span class="tx" style="left:calc(${X(a)}% + 12px)">${a}</span><span class="tx" style="left:calc(${X(b)}% - 12px);transform:translateX(-100%)">${b}</span></div></div>`; }).join("") + `</div>`;
+  $("#dchart").addEventListener("mousemove", e => { const r = e.target.closest(".drow"); if (!r) return tipHide(); const x = D.RIESGOS[+r.dataset.k];
+    tipShow(e, `<b>${x.id} · ${esc(x.n)}</b>Inherente ${x.i*x.p} (${bandTxt[band(x.i*x.p)]}) → residual ${x.ri*x.rp} (${bandTxt[band(x.ri*x.rp)]})<br>Controles: ${x.c.join(", ")}`); });
+  $("#dchart").addEventListener("mouseleave", tipHide);
+})();
 
 /* riesgos */
 $("#tb-riesgos").innerHTML = D.RIESGOS.map(r => { const v = r.i*r.p, rv = r.ri*r.rp; return `<tr>
-  <td class="id">${r.id}</td><td style="min-width:260px"><b>${esc(r.n)}</b><span class="sub">${esc(r.d)}</span></td>
+  <td class="id">${r.id}</td><td style="min-width:280px"><b>${esc(r.n)}</b><span class="sub">${esc(r.d)}</span></td>
   <td class="c">${r.i}</td><td class="c">${r.p}</td>
   <td><span class="pill ${bandCls[band(v)]}">${v} · ${bandTxt[band(v)]}</span></td>
   <td><div class="tags">${r.c.map(tag).join("")}</div></td>
   <td><span class="pill ${bandCls[band(rv)]}">${rv} · ${bandTxt[band(rv)]}</span></td></tr>`; }).join("");
-(() => { let h = ""; for (let i = 5; i >= 1; i--) { h += `<div class="ax">${i}</div>`; for (let p = 1; p <= 5; p++) {
-  const pins = D.RIESGOS.map((r,k) => (r.i===i && r.p===p ? `<i class="pin">R${k+1}</i>` : "") + (r.ri===i && r.rp===p ? `<i class="pin res">R${k+1}</i>` : "")).join("");
-  h += `<div class="cell b${band(i*p)}" title="I${i} × P${p} = ${i*p}">${pins}</div>`; } }
-  h += `<div></div>` + [1,2,3,4,5].map(p => `<div class="ax">${p}</div>`).join(""); $("#heat").innerHTML = h; })();
 
 /* tareas */
-$("#tb-tareas").innerHTML = D.TAREAS.map(t => `<tr><td class="id">${t[0]}</td><td><b>${esc(t[1])}</b></td><td>${esc(t[2])}</td><td>${esc(t[3])}</td>
+$("#tb-tareas").innerHTML = D.TAREAS.map(t => `<tr><td class="id">${t[0]}</td><td style="min-width:150px"><b>${esc(t[1])}</b></td><td style="min-width:260px">${esc(t[2])}</td><td>${esc(t[3])}</td>
   <td><div class="tags">${t[4].map(x => `<span class="tag">${x}</span>`).join("")}</div></td><td><div class="tags">${t[5].map(tag).join("")}</div></td><td class="id">${t[6]}</td></tr>`).join("");
 
 /* mapeo */
 $("#tb-mapeo").innerHTML = D.CTRL.map((c,k) => `<tr>
-  <td style="min-width:150px"><span class="id mono" style="font-weight:500">${c.id}</span>${c.comp ? ' <span class="tag comp">complementario</span>' : ""}<span class="sub" style="color:var(--ink)">${esc(c.n)}</span></td>
+  <td style="min-width:170px"><span class="tag${c.comp ? " comp" : ""}" style="font-size:12.5px">${c.id}</span><span class="sub" style="color:var(--ink);font-weight:500;margin-top:6px">${esc(c.n)}</span>${c.comp ? '<span class="sub">Complementario</span>' : ""}</td>
   <td style="min-width:260px">${esc(c.impl)}</td>
-  <td style="min-width:280px">${esc(c.obs)}<details class="sql"><summary>Ver consulta SQL</summary><div class="code"><button class="copy" type="button" data-k="${k}">Copiar</button><pre>${esc(c.sql)}</pre></div></details></td>
+  <td style="min-width:300px">${esc(c.obs)}<details class="sql"><summary>Ver consulta SQL</summary><div class="code"><button class="copy" type="button" data-k="${k}">Copiar</button><pre>${esc(c.sql)}</pre></div></details></td>
   <td class="id">${c.t}</td><td class="id">${c.s}</td></tr>`).join("");
 document.addEventListener("click", e => { const b = e.target.closest(".copy"); if (!b) return;
   const pre = b.nextElementSibling;
@@ -334,21 +466,20 @@ document.addEventListener("click", e => { const b = e.target.closest(".copy"); i
   try { navigator.clipboard.writeText(D.CTRL[+b.dataset.k].sql).then(() => { b.textContent = "Copiado"; setTimeout(() => b.textContent = "Copiar", 1500); }, sel); } catch(err) { sel(); } });
 
 /* observables */
-$("#obs").innerHTML = D.CTRL.filter(c => !c.comp).map(c => `<article class="card"><div class="top"><code>${c.id}</code><span class="tag">${c.pr}</span></div>
+$("#obs").innerHTML = D.CTRL.filter(c => !c.comp).map((c,i) => `<article class="card oc"><div class="top"><span class="cid">${c.id}</span><span class="num">${String(i+1).padStart(2,"0")} / 15 · ${c.pr}</span></div>
   <h4>${esc(c.n)}</h4><p>${esc(c.obs)}</p><div class="crit"><b>Se acepta si:</b> ${esc(c.crit)}</div></article>`).join("");
 
 /* matriz */
 let fM = "Todos";
 function pintarMatriz(){
-  const rows = D.CTRL.filter(c => fM === "Todos" || estado(c.lv)[0] === fM);
-  $("#tb-matriz").innerHTML = rows.map(c => { const [t,cl] = estado(c.lv); return `<tr>
+  $("#tb-matriz").innerHTML = D.CTRL.filter(c => fM === "Todos" || estado(c.lv)[0] === fM).map(c => { const [t,cl] = estado(c.lv); return `<tr>
     <td class="id">${c.t}</td><td class="id">${c.r}</td>
-    <td style="min-width:150px"><span class="mono" style="font-weight:500">${c.id}</span>${c.comp ? ' <span class="tag comp">compl.</span>' : ""}<span class="sub" style="color:var(--ink)">${esc(c.n)}</span></td>
-    <td style="min-width:190px">${meter(c.lv)}<b>Nivel ${c.lv}</b><span class="sub">Nivel 4: ${esc(c.n4)}</span></td>
-    <td style="min-width:300px">${esc(c.res)}<span class="sub">Criterio: ${esc(c.crit)} · ${c.pr}</span></td>
+    <td style="min-width:160px"><span class="tag${c.comp ? " comp" : ""}">${c.id}</span><span class="sub" style="color:var(--ink);font-weight:500;margin-top:6px">${esc(c.n)}</span></td>
+    <td style="min-width:200px">${meter(c.lv)}<b>Nivel ${c.lv}</b><span class="sub">Nivel 4: ${esc(c.n4)}</span></td>
+    <td style="min-width:320px">${esc(c.res)}<span class="sub">Criterio: ${esc(c.crit)} · ${c.pr}</span></td>
     <td><span class="pill ${cl}">${t}</span></td></tr>`; }).join("");
   $("#f-matriz").innerHTML = ["Todos","Cumple","Parcial","No cumple"].map(t => { const k = t === "Todos" ? D.CTRL.length : D.CTRL.filter(c => estado(c.lv)[0] === t).length;
-    return `<button type="button" data-f="${t}" aria-pressed="${t === fM}">${t} · ${k}</button>`; }).join("");
+    return `<button type="button" data-f="${t}" aria-pressed="${t === fM}">${t}<span class="k">${k}</span></button>`; }).join("");
 }
 $("#f-matriz").addEventListener("click", e => { const b = e.target.closest("button"); if (b) { fM = b.dataset.f; pintarMatriz(); } });
 pintarMatriz();
@@ -359,18 +490,18 @@ let fP = "Todas";
 function pintarPruebas(){
   $("#tb-pruebas").innerHTML = D.PRUEBAS.filter(p => fP === "Todas" || p[1] === fP).map(p => { const r = D.RESULT[p[0]]; return `<tr>
     <td class="id">${p[0]}</td><td>${TIPO[p[1]]}</td><td>${tag(p[2])}</td>
-    <td style="min-width:240px">${esc(p[3])}</td><td style="min-width:220px">${esc(p[4])}</td><td>${esc(p[5])}</td>
+    <td style="min-width:250px">${esc(p[3])}</td><td style="min-width:230px">${esc(p[4])}</td><td style="min-width:120px">${esc(p[5])}</td>
     <td><span class="pill ${r === "Conforme" ? "p-ok" : "p-warn"}">${r}</span></td></tr>`; }).join("");
   $("#f-pruebas").innerHTML = ["Todas","Configuracion","Funcional","Negativa","Revision"].map(t => { const k = t === "Todas" ? D.PRUEBAS.length : D.PRUEBAS.filter(p => p[1] === t).length;
-    return `<button type="button" data-f="${t}" aria-pressed="${t === fP}">${t === "Todas" ? "Todas" : TIPO[t]} · ${k}</button>`; }).join("");
+    return `<button type="button" data-f="${t}" aria-pressed="${t === fP}">${t === "Todas" ? "Todas" : TIPO[t]}<span class="k">${k}</span></button>`; }).join("");
 }
 $("#f-pruebas").addEventListener("click", e => { const b = e.target.closest("button"); if (b) { fP = b.dataset.f; pintarPruebas(); } });
 pintarPruebas();
 
 /* mejora y scripts */
 $("#tb-mejora").innerHTML = D.MEJORA.map(m => { const c = D.CTRL.find(x => x.id === m[0]); const [t,cl] = estado(c ? c.lv : 0);
-  return `<tr><td class="id">${m[0]}<span class="sub"><span class="pill ${cl}">${t}</span></span></td><td>${esc(m[1])}</td><td>${esc(m[2])}</td><td>${esc(m[3])}</td><td class="c">${m[4]}</td></tr>`; }).join("");
-$("#tb-scripts").innerHTML = D.SCRIPTS.map((s,i) => `<tr><td class="c">${i+1}</td><td class="id">${s[0]}</td><td>${esc(s[1])}</td></tr>`).join("");
+  return `<tr><td style="min-width:120px"><span class="tag">${m[0]}</span><span class="sub" style="margin-top:6px"><span class="pill ${cl}">${t}</span></span></td><td style="min-width:240px">${esc(m[1])}</td><td style="min-width:280px">${esc(m[2])}</td><td>${esc(m[3])}</td><td class="c">Nivel ${m[4]}</td></tr>`; }).join("");
+$("#tb-scripts").innerHTML = D.SCRIPTS.map((s,i) => `<div class="st"><b class="n">${i+1}</b><div><div class="f">${s[0]}</div><p>${esc(s[1])}</p></div></div>`).join("");
 
 show((location.hash || "#resumen").slice(1), false);
 </script>
