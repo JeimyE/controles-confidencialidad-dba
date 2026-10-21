@@ -1,0 +1,30 @@
+# =====================================================================
+# 10b_backup_cifrado.rman
+# Controles: A.8.13 (copias de seguridad), A.8.24 (criptografia),
+#            A.8.12 (prevencion de fuga: un backup robado no es legible)
+# Tarea DBA: T-06 Backup cifrado
+#
+# Ejecutar en PowerShell (separacion de funciones con SYSBACKUP):
+#   rman target '"c##backup_op/Bk7#Rm9$Xp2026 as sysbackup"' cmdfile=10b_backup_cifrado.rman log=evidencia_backup.log
+# Alternativa simple:
+#   rman target / cmdfile=10b_backup_cifrado.rman log=evidencia_backup.log
+#
+# Requiere: keystore TDE abierto (script 01) y ARCHIVELOG (script 10a).
+# Cifrado TRANSPARENTE: usa la llave maestra del keystore TDE.
+# =====================================================================
+
+CONFIGURE ENCRYPTION FOR DATABASE ON;
+CONFIGURE ENCRYPTION ALGORITHM 'AES256';
+CONFIGURE CONTROLFILE AUTOBACKUP ON;
+CONFIGURE RETENTION POLICY TO REDUNDANCY 2;
+CONFIGURE BACKUP OPTIMIZATION ON;
+
+SHOW ALL;
+
+BACKUP AS COMPRESSED BACKUPSET DATABASE PLUS ARCHIVELOG TAG 'BKP_CONF_AES256';
+
+# Prueba de restaurabilidad sin restaurar realmente (PRB-17)
+RESTORE DATABASE VALIDATE;
+
+CROSSCHECK BACKUP;
+LIST BACKUP SUMMARY;

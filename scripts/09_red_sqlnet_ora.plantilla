@@ -1,0 +1,48 @@
+# =====================================================================
+# 09_red_sqlnet_ora.plantilla
+# Controles: A.8.20 (seguridad de redes), A.8.5 (autenticacion segura),
+#            A.8.24 (cifrado en transito)
+# Tarea DBA: T-09 Listener y Oracle Net
+#
+# DONDE VA: en 21c el Oracle Home es de solo lectura. La carpeta real de
+# configuracion se obtiene en PowerShell con:
+#     orabasehome
+# y el archivo es:  <resultado>\network\admin\sqlnet.ora
+# HAGA UNA COPIA del sqlnet.ora original antes de editar.
+#
+# Agregar estas lineas al sqlnet.ora del SERVIDOR:
+# =====================================================================
+
+# --- Cifrado nativo de Oracle Net (datos en transito) ---
+SQLNET.ENCRYPTION_SERVER = REQUIRED
+SQLNET.ENCRYPTION_TYPES_SERVER = (AES256)
+SQLNET.CRYPTO_CHECKSUM_SERVER = REQUIRED
+SQLNET.CRYPTO_CHECKSUM_TYPES_SERVER = (SHA256)
+
+# --- Solo verificadores de contrasena modernos (12C, sin 10G/11G) ---
+SQLNET.ALLOWED_LOGON_VERSION_SERVER = 12a
+
+# --- Lista blanca de equipos que pueden conectarse al listener ---
+TCP.VALIDNODE_CHECKING = YES
+TCP.INVITED_NODES = (127.0.0.1, localhost)
+#   Agregue aqui la IP de su PC si SQL Developer se conecta por esa IP
+#   (ipconfig -> Direccion IPv4). Toda IP no listada es rechazada.
+
+# --- Detectar sesiones muertas ---
+SQLNET.EXPIRE_TIME = 10
+
+# =====================================================================
+# Aplicar cambios (PowerShell):
+#     lsnrctl reload
+#     lsnrctl status
+#
+# Si SQL Developer deja de conectar, cambie REQUIRED por REQUESTED en
+# las dos primeras lineas, recargue y documente el hallazgo (Parcial).
+# La conexion local "sqlplus / as sysdba" no usa la red y no se afecta.
+#
+# Evidencia: conectado por TCP (no con / as sysdba) ejecutar
+#   SELECT network_service_banner FROM v$session_connect_info
+#   WHERE sid = SYS_CONTEXT('USERENV','SID');
+# Esperado: "AES256 Encryption service adapter" y
+#           "SHA256 Crypto-checksumming service adapter"
+# =====================================================================

@@ -1,0 +1,750 @@
+================================================================
+VERIFICACION DE CONTROLES ISO/IEC 27001:2022 - ORACLE 21c XE
+================================================================
+
+FECHA_EJECUCION
+--------------------------
+EJECUTADO_POR
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+BASE
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+2026-10-21 13:07:15 -06:00
+SYS
+XE
+
+
+1 fila seleccionada.
+
+
+Sesión modificada.
+
+
+===============================================================
+[A.8.24] Uso de criptografia - Keystore TDE  (PRB-01)
+Esperado: STATUS=OPEN, WALLET_TYPE=AUTOLOGIN en CDB y XEPDB1
+===============================================================
+
+    CON_ID CONTENEDOR                                                                                                                       WRL_TYPE             WRL_PARAMETER
+---------- -------------------------------------------------------------------------------------------------------------------------------- -------------------- -----------------------------------
+STATUS                         WALLET_TYPE          KEYSTORE
+------------------------------ -------------------- --------
+         1 CDB$ROOT                                                                                                                         FILE                 C:\ORACLE_WALLET\XE\tde\
+OPEN                           AUTOLOGIN            NONE
+
+         2 PDB$SEED                                                                                                                         FILE
+OPEN                           AUTOLOGIN            UNITED
+
+         3 XEPDB1                                                                                                                           FILE
+OPEN                           AUTOLOGIN            UNITED
+
+
+3 filas seleccionadas.
+
+
+===============================================================
+[A.8.2] Derechos de acceso privilegiado - Privilegios administrativos
+Esperado: solo SYS con SYSDBA; C##BACKUP_OP=SYSBACKUP; C##KEY_ADMIN=SYSKM
+===============================================================
+
+USERNAME             SYSDB SYSOP SYSBA SYSDG SYSKM ACCOUNT_STATUS
+-------------------- ----- ----- ----- ----- ----- ------------------------------
+C##BACKUP_OP         FALSE FALSE TRUE  FALSE FALSE OPEN
+C##KEY_ADMIN         FALSE FALSE FALSE FALSE TRUE  OPEN
+SYS                  TRUE  TRUE  FALSE FALSE FALSE OPEN
+
+3 filas seleccionadas.
+
+
+===============================================================
+[A.8.13] Copias de seguridad - Configuracion y piezas cifradas (PRB-16)
+Esperado: ARCHIVELOG; ENCRYPTION FOR DATABASE ON; ENCRYPTED=YES
+===============================================================
+
+LOG_MODE
+------------
+ARCHIVELOG
+
+1 fila seleccionada.
+
+
+NAME                                VALUE
+----------------------------------- ----------------------------------------
+BACKUP OPTIMIZATION                 ON
+CHANNEL                             DEVICE TYPE DISK FORMAT   'C:\tld\backup
+                                    \%d_%T_%U.bkp'
+
+COMPRESSION ALGORITHM               'BASIC' AS OF RELEASE 'DEFAULT' OPTIMIZE
+                                     FOR LOAD TRUE
+
+CONTROLFILE AUTOBACKUP              ON
+DEVICE TYPE                         DISK PARALLELISM 1 BACKUP TYPE TO COMPRE
+                                    SSED BACKUPSET
+
+ENCRYPTION ALGORITHM                'AES256'
+ENCRYPTION FOR DATABASE             ON
+RETENTION POLICY                    TO REDUNDANCY 2
+
+8 filas seleccionadas.
+
+Piezas de respaldo disponibles (ultimos 7 dias) con tipo y cifrado
+B = D (datos/controlfile) o L (archivelogs); CON = incluye controlfile
+
+FECHA            ENC B CON HANDLE
+---------------- --- - --- ------------------------------------------------------------
+2026-10-14 20:52 NO  L NO  C:\TLD\BACKUP\XE_20261014_0F54SRSG_15_1_1.BKP
+2026-10-14 20:53 NO  D NO  C:\TLD\BACKUP\XE_20261014_0G54SRT0_16_1_1.BKP
+2026-10-14 20:53 NO  D NO  C:\TLD\BACKUP\XE_20261014_0H54SRUN_17_1_1.BKP
+2026-10-14 20:54 NO  D NO  C:\TLD\BACKUP\XE_20261014_0I54SRVH_18_1_1.BKP
+2026-10-14 20:54 NO  L NO  C:\TLD\BACKUP\XE_20261014_0J54SS0A_19_1_1.BKP
+2026-10-14 20:54 NO  D YES C:\LAB\FRA\XE\AUTOBACKUP\2026_10_14\O1_MF_S_1246654475_OF0J3
+                           CY2_.BKP
+
+2026-10-21 12:13 NO  D YES C:\LAB\FRA\XE\AUTOBACKUP\2026_10_21\O1_MF_S_1247228021_OFL06
+                           OXP_.BKP
+
+2026-10-21 12:49 YES L NO  C:\TLD\BACKUP\XE_20261021_0M55EE7I_22_1_1.BKP
+2026-10-21 12:51 YES D NO  C:\TLD\BACKUP\XE_20261021_0N55EE7P_23_1_1.BKP
+2026-10-21 12:51 YES D NO  C:\TLD\BACKUP\XE_20261021_0O55EE9R_24_1_1.BKP
+2026-10-21 12:51 YES L NO  C:\TLD\BACKUP\XE_20261021_0P55EEAK_25_1_1.BKP
+2026-10-21 12:51 YES D YES C:\LAB\FRA\XE\AUTOBACKUP\2026_10_21\O1_MF_S_1247230294_OFL2F
+                           PDK_.BKP
+
+
+12 filas seleccionadas.
+
+
+SESSION_KEY INPUT_TYPE   STATUS                  INICIO
+----------- ------------ ----------------------- ----------------
+TAMANO
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+         61 DB FULL      COMPLETED               2026-10-21 12:49
+  598.02M
+
+         31 DB FULL      COMPLETED               2026-10-14 20:52
+  773.12M
+
+         17 DB INCR      COMPLETED               2026-10-01 21:15
+  668.45M
+
+          6 DB INCR      COMPLETED               2026-10-01 20:37
+  665.92M
+
+
+4 filas seleccionadas.
+
+
+===============================================================
+[A.8.8 - complementario] Gestion de vulnerabilidades tecnicas (PRB-23)
+Esperado (hallazgo): XE no recibe Release Updates -> estado PARCIAL
+===============================================================
+
+BANNER_FULL
+------------------------------------------------------------------------------------------
+Oracle Database 21c Express Edition Release 21.0.0.0.0 - Production
+Version 21.3.0.0.0
+
+
+1 fila seleccionada.
+
+
+ninguna fila seleccionada
+
+
+Sesión modificada.
+
+
+===============================================================
+[A.8.24 - complementario] Tablespaces cifrados (PRB-02)
+Esperado: TS_CONF_ENC ENCRYPTED=YES, algoritmo AES256
+===============================================================
+
+TABLESPACE                     ENCRYPT STATUS
+------------------------------ ------- ----------
+TS_CONF_ENC                    AES256  NORMAL
+
+1 fila seleccionada.
+
+
+OWNER                                                                                                                                TABLAS EN_TS_CIFRADO
+-------------------------------------------------------------------------------------------------------------------------------- ---------- -------------
+APP_CONF                                                                                                                                  3             3
+
+1 fila seleccionada.
+
+
+===============================================================
+[A.5.12] Clasificacion de la informacion (PRB-21)
+Esperado: toda columna CONFIDENCIAL/RESTRINGIDO protegida con Redaction
+(NOMBRE e ID son INTERNO: protegidos por VPD/roles)
+===============================================================
+
+COLUMNA      NIVEL         CATEGORIA_DATO                             PROTECCION
+------------ ------------- ------------------------------------------ -------------------
+CEDULA       CONFIDENCIAL  Dato personal identificativo (Ley 8968)    REDACTADA
+EMAIL        CONFIDENCIAL  Dato personal de contacto (Ley 8968)       REDACTADA
+TELEFONO     CONFIDENCIAL  Dato personal de contacto (Ley 8968)       REDACTADA
+ID_CLIENTE   INTERNO       Identificador tecnico                      ** SIN REDACCION **
+NOMBRE       INTERNO       Dato personal identificativo (Ley 8968)    ** SIN REDACCION **
+PROVINCIA    INTERNO       Dato de ubicacion general                  ** SIN REDACCION **
+SALARIO      RESTRINGIDO   Dato financiero (acceso restringido)       REDACTADA
+TARJETA      RESTRINGIDO   Dato financiero (acceso restringido)       REDACTADA
+
+8 filas seleccionadas.
+
+Columnas CONFIDENCIAL/RESTRINGIDO sin redaccion (esperado: 0)
+
+SIN_PROTECCION
+--------------
+             0
+
+1 fila seleccionada.
+
+
+COLUMN_NAM COMMENTS
+---------- ----------------------------------------------------------------------
+CEDULA     CLASIFICACION=CONFIDENCIAL | Dato personal identificativo
+EMAIL      CLASIFICACION=CONFIDENCIAL | Dato personal de contacto
+TELEFONO   CLASIFICACION=CONFIDENCIAL | Dato personal de contacto
+SALARIO    CLASIFICACION=RESTRINGIDO | Dato financiero
+TARJETA    CLASIFICACION=RESTRINGIDO | Dato financiero
+
+5 filas seleccionadas.
+
+
+===============================================================
+[A.5.15] Control de acceso - Privilegios directos a usuarios (PRB-11)
+Esperado: 0 filas (todo se asigna mediante roles)
+===============================================================
+
+GRANTEE            PRIVILEGIO                                         TIPO
+------------------ -------------------------------------------------- -------
+C##KEY_ADMIN       CREATE SESSION                                     SISTEMA
+C##BACKUP_OP       CREATE SESSION                                     SISTEMA
+TLD_USER           CREATE SEQUENCE                                    SISTEMA
+TLD_USER           CREATE TABLE                                       SISTEMA
+TLD_USER           UNLIMITED TABLESPACE                               SISTEMA
+TLD_USER           CREATE SESSION                                     SISTEMA
+SEMILLEROS         CREATE VIEW                                        SISTEMA
+PRUEBA             CREATE TABLE                                       SISTEMA
+PRUEBA             CREATE SESSION                                     SISTEMA
+
+9 filas seleccionadas.
+
+Privilegios por rol de aplicacion
+
+ROLE                 PRIVILEGIO                                         TIPO
+-------------------- -------------------------------------------------- -------
+ROL_ANALISTA_CONF    SELECT ON APP_CONF.CLIENTES                        OBJETO
+ROL_ANALISTA_CONF    CREATE SESSION                                     SISTEMA
+ROL_AUDITOR_CONF     SELECT ON APP_CONF.REGISTRO_SUPRESIONES            OBJETO
+ROL_AUDITOR_CONF     AUDIT_VIEWER                                       ROL
+ROL_AUDITOR_CONF     SELECT_CATALOG_ROLE                                ROL
+ROL_AUDITOR_CONF     CREATE SESSION                                     SISTEMA
+ROL_DBA_OPER_CONF    SELECT_CATALOG_ROLE                                ROL
+ROL_DBA_OPER_CONF    ALTER USER                                         SISTEMA
+ROL_DBA_OPER_CONF    CREATE SESSION                                     SISTEMA
+ROL_DESARROLLO_CONF  DELETE ON APP_CONF_DEV.CLIENTES                    OBJETO
+ROL_DESARROLLO_CONF  INSERT ON APP_CONF_DEV.CLIENTES                    OBJETO
+ROL_DESARROLLO_CONF  SELECT ON APP_CONF_DEV.CLIENTES                    OBJETO
+ROL_DESARROLLO_CONF  UPDATE ON APP_CONF_DEV.CLIENTES                    OBJETO
+ROL_DESARROLLO_CONF  CREATE SESSION                                     SISTEMA
+ROL_OPERADOR_CONF    EXECUTE ON APP_CONF.PRC_SUPRIMIR_TITULAR           OBJETO
+ROL_OPERADOR_CONF    INSERT ON APP_CONF.CLIENTES                        OBJETO
+ROL_OPERADOR_CONF    SELECT ON APP_CONF.CLIENTES                        OBJETO
+ROL_OPERADOR_CONF    UPDATE ON APP_CONF.CLIENTES                        OBJETO
+ROL_OPERADOR_CONF    CREATE SESSION                                     SISTEMA
+
+19 filas seleccionadas.
+
+
+===============================================================
+[A.5.16] Gestion de identidades - Cuentas no mantenidas por Oracle
+Esperado: cuentas nominativas, PERFIL_CONF, esquemas en NONE (sin login)
+===============================================================
+
+USERNAME             ACCOUNT_STATUS                   PROFILE        AUTHENTI CREADA     LAST_LOGIN
+-------------------- -------------------------------- -------------- -------- ---------- --------------------
+APP_CONF             OPEN                             DEFAULT        NONE     2026-10-21
+APP_CONF_DEV         OPEN                             DEFAULT        NONE     2026-10-21
+C##BACKUP_OP         OPEN                             DEFAULT        PASSWORD 2026-10-21
+C##KEY_ADMIN         OPEN                             DEFAULT        PASSWORD 2026-10-21
+PDBADMIN             OPEN                             DEFAULT        PASSWORD 2026-02-24
+PRUEBA               OPEN                             DEFAULT        PASSWORD 2026-10-14
+SEMILLEROS           OPEN                             DEFAULT        PASSWORD 2026-02-24 2026-05-16 18:43
+TLD_USER             OPEN                             DEFAULT        PASSWORD 2026-08-27 2026-08-27 01:58
+U_ANALISTA           OPEN                             PERFIL_CONF    PASSWORD 2026-10-21 2026-10-21 13:03
+U_AUDITOR            OPEN                             PERFIL_CONF    PASSWORD 2026-10-21 2026-10-21 13:03
+U_DBA_JR             OPEN                             PERFIL_CONF    PASSWORD 2026-10-21
+U_DESARROLLADOR      OPEN                             PERFIL_CONF    PASSWORD 2026-10-21 2026-10-21 13:03
+U_OPERADOR           OPEN                             PERFIL_CONF    PASSWORD 2026-10-21 2026-10-21 13:03
+
+13 filas seleccionadas.
+
+Cuentas abiertas sin uso en 90 dias (esperado: 0)
+
+USERNAME
+--------------------
+PDBADMIN
+SEMILLEROS
+
+2 filas seleccionadas.
+
+
+===============================================================
+[A.5.17] Informacion de autenticacion (PRB-13)
+Esperado: perfil con complejidad y bloqueo; 0 cuentas abiertas con
+contrasena por defecto
+===============================================================
+
+RESOURCE_NAME                LIMIT
+---------------------------- --------------------------------
+FAILED_LOGIN_ATTEMPTS        3
+INACTIVE_ACCOUNT_TIME        90
+PASSWORD_GRACE_TIME          7
+PASSWORD_LIFE_TIME           90
+PASSWORD_LOCK_TIME           ,0416
+PASSWORD_REUSE_MAX           5
+PASSWORD_REUSE_TIME          365
+PASSWORD_ROLLOVER_TIME       DEFAULT
+PASSWORD_VERIFY_FUNCTION     ORA12C_STRONG_VERIFY_FUNCTION
+
+9 filas seleccionadas.
+
+
+ninguna fila seleccionada
+
+
+===============================================================
+[A.5.18] Derechos de acceso - Revision de privilegios efectivos
+Esperado: cada usuario solo con el rol de su funcion
+===============================================================
+
+USUARIO          ROL_HEREDADO                 ADM
+---------------- ---------------------------- ---
+PDBADMIN         PDB_DBA                      YES
+PDBADMIN           CONNECT                    NO
+SEMILLEROS       CONNECT                      NO
+SEMILLEROS       RESOURCE                     NO
+SEMILLEROS         SODA_APP                   NO
+TLD_USER         CONNECT                      NO
+TLD_USER         RESOURCE                     NO
+TLD_USER           SODA_APP                   NO
+TLD_USER         SELECT_CATALOG_ROLE          NO
+TLD_USER           HS_ADMIN_SELECT_ROLE       NO
+U_ANALISTA       ROL_ANALISTA_CONF            NO
+U_AUDITOR        ROL_AUDITOR_CONF             NO
+U_AUDITOR          AUDIT_VIEWER               NO
+U_AUDITOR          SELECT_CATALOG_ROLE        NO
+U_AUDITOR            HS_ADMIN_SELECT_ROLE     NO
+U_DBA_JR         ROL_DBA_OPER_CONF            NO
+U_DBA_JR           SELECT_CATALOG_ROLE        NO
+U_DBA_JR             HS_ADMIN_SELECT_ROLE     NO
+U_DESARROLLADOR  ROL_DESARROLLO_CONF          NO
+U_OPERADOR       ROL_OPERADOR_CONF            NO
+
+20 filas seleccionadas.
+
+
+===============================================================
+[A.5.33] Proteccion de registros - Retencion de auditoria (PRB-15)
+Esperado: job de purga ENABLED; marca de archivo ~365 dias atras
+AUDIT_ADMIN solo en cuentas de Oracle
+===============================================================
+
+JOB_NAME                     JOB_STAT JOB_FREQUENCY
+---------------------------- -------- ----------------------------------------------------------------------------------------------------
+PURGA_AUDIT_CONF             ENABLED  FREQ=HOURLY;INTERVAL=24
+
+1 fila seleccionada.
+
+
+AUDIT_TRAIL          LAST_ARCHIVE_TS
+-------------------- ---------------------------------------------------------------------------
+UNIFIED AUDIT TRAIL  21/10/25 12:16:02,354000 +00:00
+
+1 fila seleccionada.
+
+
+JOB_NAME                     ENABL STATE
+---------------------------- ----- ---------------
+REPEAT_INTERVAL
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+JOB_RETENCION_AUDIT_CONF     TRUE  SCHEDULED
+FREQ=DAILY;BYHOUR=1
+
+
+1 fila seleccionada.
+
+
+GRANTEE            GRANTED_ROLE
+------------------ --------------------------------------------------------------------------------------------------------------------------------
+SYS                AUDIT_ADMIN
+ROL_AUDITOR_CONF   AUDIT_VIEWER
+SYS                AUDIT_VIEWER
+
+3 filas seleccionadas.
+
+
+===============================================================
+[A.8.2] Derechos de acceso privilegiado - Rol DBA y privilegios ANY (PRB-12)
+Esperado: DBA solo en SYS/SYSTEM; ningun usuario de aplicacion con ANY
+===============================================================
+
+GRANTEE            GRANTED_ROLE                                                                                                                     ADM
+------------------ -------------------------------------------------------------------------------------------------------------------------------- ---
+DBA                DATAPUMP_EXP_FULL_DATABASE                                                                                                       NO
+GSMADMIN_INTERNAL  DATAPUMP_EXP_FULL_DATABASE                                                                                                       NO
+GSMUSER_ROLE       DATAPUMP_EXP_FULL_DATABASE                                                                                                       NO
+SYS                DATAPUMP_EXP_FULL_DATABASE                                                                                                       YES
+SYS                DBA                                                                                                                              YES
+SYSTEM             DBA                                                                                                                              NO
+DATAPUMP_EXP_FULL_ EXP_FULL_DATABASE                                                                                                                NO
+DATABASE
+
+DATAPUMP_IMP_FULL_ EXP_FULL_DATABASE                                                                                                                NO
+DATABASE
+
+DBA                EXP_FULL_DATABASE                                                                                                                NO
+SYS                EXP_FULL_DATABASE                                                                                                                YES
+PDBADMIN           PDB_DBA                                                                                                                          YES
+SYS                PDB_DBA                                                                                                                          YES
+
+12 filas seleccionadas.
+
+
+ninguna fila seleccionada
+
+
+===============================================================
+[A.8.3] Restriccion de acceso a la informacion - VPD
+Esperado: POL_VPD_CLIENTES habilitada para SEL/INS/UPD/DEL
+===============================================================
+
+OBJECT_NAME  POLICY_NAME          FUNCTION           SEL INS UPD DEL ENA
+------------ -------------------- ------------------ --- --- --- --- ---
+CLIENTES     POL_VPD_CLIENTES     FN_VPD_CLIENTES    YES YES YES YES YES
+
+1 fila seleccionada.
+
+Usuarios exentos de VPD (esperado: solo cuentas de Oracle)
+
+GRANTEE
+------------------
+GSMUSER_ROLE
+
+1 fila seleccionada.
+
+
+===============================================================
+[A.8.5] Autenticacion segura (PRB-10)
+Esperado: verificadores solo 12C; bloqueo a los 3 intentos
+===============================================================
+
+USERNAME             PASSWORD_VERSIONS  PROFILE
+-------------------- ------------------ --------------
+C##BACKUP_OP         12C                DEFAULT
+C##KEY_ADMIN         12C                DEFAULT
+PDBADMIN             11G 12C            DEFAULT
+PRUEBA               11G 12C            DEFAULT
+SEMILLEROS           11G 12C            DEFAULT
+TLD_USER             11G 12C            DEFAULT
+U_ANALISTA           12C                PERFIL_CONF
+U_AUDITOR            12C                PERFIL_CONF
+U_DBA_JR             12C                PERFIL_CONF
+U_DESARROLLADOR      12C                PERFIL_CONF
+U_OPERADOR           12C                PERFIL_CONF
+
+11 filas seleccionadas.
+
+
+FAILED_LOGIN_ATTEMPTS
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+3
+
+1 fila seleccionada.
+
+
+NAME                                VALUE
+----------------------------------- --------------------
+resource_limit                      TRUE
+remote_login_passwordfile           EXCLUSIVE
+sec_protocol_error_further_action   (DROP,3)
+sec_max_failed_login_attempts       3
+
+4 filas seleccionadas.
+
+
+===============================================================
+[A.8.10] Eliminacion de informacion (PRB-09)
+Esperado: papelera vacia para APP_CONF; supresiones registradas con hash
+===============================================================
+
+OBJETOS_EN_PAPELERA
+-------------------
+                  0
+
+1 fila seleccionada.
+
+
+TIPO                  REGISTROS ULTIMA
+-------------------- ---------- ---------------------------------------------------------------------------
+RETENCION                     1 21/10/26 12:20:59,040000
+TITULAR                       2 21/10/26 13:03:21,275000
+
+2 filas seleccionadas.
+
+Clientes que exceden el plazo de 5 anios (esperado: 0)
+
+FUERA_DE_PLAZO
+--------------
+             0
+
+1 fila seleccionada.
+
+
+===============================================================
+[A.8.11] Enmascaramiento de datos - Data Redaction (PRB-04)
+Esperado: POL_REDACT_CLIENTES habilitada sobre 5 columnas
+===============================================================
+
+OBJECT_NAME  POLICY_NAME          EXPRESSION                                                   ENA
+------------ -------------------- ------------------------------------------------------------ ---
+CLIENTES     POL_REDACT_CLIENTES  SYS_CONTEXT('SYS_SESSION_ROLES','ROL_OPERADOR_CONF') = 'FALS YES
+                                  E' AND SYS_CONTEXT('USERENV','CURRENT_USER') <> 'APP_CONF'
+
+
+1 fila seleccionada.
+
+
+COLUMN_NAM FUNCTION_TYPE               FUNCTION_PARAMETERS
+---------- --------------------------- ------------------------------------
+CEDULA     PARTIAL REDACTION           VVVVVVVVV,VVVVVVVVV,*,1,5
+EMAIL      REGEXP REDACTION
+SALARIO    FULL REDACTION
+TARJETA    PARTIAL REDACTION           VVVVVVVVVVVVVVVV,VVVVVVVVVVVVVVVV,*,
+                                       1,12
+
+TELEFONO   PARTIAL REDACTION           VVVVVVVV,VVVVVVVV,*,1,4
+
+5 filas seleccionadas.
+
+
+===============================================================
+[A.8.12] Prevencion de fuga de datos (PRB-22)
+Esperado: EXEMPT REDACTION POLICY y exportacion completa solo en
+roles/cuentas de Oracle; PUBLIC sin UTL_FILE/UTL_HTTP/UTL_TCP/UTL_SMTP
+(si PUBLIC conserva alguno -> documentar como PARCIAL)
+===============================================================
+
+GRANTEE            PRIVILEGE
+------------------ ----------------------------------------
+GSMUSER_ROLE       EXEMPT ACCESS POLICY
+EXP_FULL_DATABASE  EXEMPT REDACTION POLICY
+DBA                EXPORT FULL DATABASE
+SYS                EXPORT FULL DATABASE
+DATAPUMP_IMP_FULL_ SELECT ANY TABLE
+DATABASE
+
+DBA                SELECT ANY TABLE
+EXP_FULL_DATABASE  SELECT ANY TABLE
+GGSYS              SELECT ANY TABLE
+GSMADMIN_INTERNAL  SELECT ANY TABLE
+IMP_FULL_DATABASE  SELECT ANY TABLE
+OLAP_DBA           SELECT ANY TABLE
+SYS                SELECT ANY TABLE
+SYSTEM             SELECT ANY TABLE
+WMSYS              SELECT ANY TABLE
+
+14 filas seleccionadas.
+
+
+GRANTEE            TABLE_NAME                                                                                                                       PRIVILEGE
+------------------ -------------------------------------------------------------------------------------------------------------------------------- ----------------------------------------
+PUBLIC             UTL_TCP                                                                                                                          EXECUTE
+PUBLIC             UTL_HTTP                                                                                                                         EXECUTE
+PUBLIC             UTL_FILE                                                                                                                         EXECUTE
+PUBLIC             UTL_INADDR                                                                                                                       EXECUTE
+PUBLIC             UTL_SMTP                                                                                                                         EXECUTE
+PUBLIC             DBMS_LDAP                                                                                                                        EXECUTE
+
+6 filas seleccionadas.
+
+
+POLICY_NAME          ENABLED_OPTION
+-------------------- ---------------
+POL_AUD_EXPORTACIONE BY USER
+S
+
+
+1 fila seleccionada.
+
+
+===============================================================
+[A.8.33 - complementario] Informacion de prueba (PRB-20)
+Esperado: 0 coincidencias de datos reales en DEV
+===============================================================
+
+CEDULAS_REALES NOMBRES_REALES EMAILS_REALES TARJETAS_REALES
+-------------- -------------- ------------- ---------------
+             0              0             0               0
+
+1 fila seleccionada.
+
+
+===============================================================
+[A.8.15] Registro (logging) - Politicas y eventos (PRB-14)
+Esperado: politicas POL_AUD_* y ORA_LOGON_FAILURES activas
+eventos de las pruebas presentes
+===============================================================
+
+POLICY_NAME                ENABLED_OPTION  ENTITY_NAME                                                                                                                      SUC FAI
+-------------------------- --------------- -------------------------------------------------------------------------------------------------------------------------------- --- ---
+ORA_ACCOUNT_MGMT           BY USER         ALL USERS                                                                                                                        YES YES
+ORA_LOGON_FAILURES         BY USER         ALL USERS                                                                                                                        NO  YES
+ORA_SECURECONFIG           BY USER         ALL USERS                                                                                                                        YES YES
+POL_AUD_ADMIN_CONF         BY USER         ALL USERS                                                                                                                        YES YES
+POL_AUD_DATOS_CONF         BY USER         ALL USERS                                                                                                                        YES YES
+POL_AUD_EXPORTACIONES      BY USER         ALL USERS                                                                                                                        YES YES
+
+6 filas seleccionadas.
+
+
+FECHA               DBUSERNAME      ACTION_NAME      OBJECT_SCHEMA                                                                                                                    OBJECT_NAME  RETURN_CODE
+------------------- --------------- ---------------- -------------------------------------------------------------------------------------------------------------------------------- ------------ -----------
+UNIFIED_AUDIT_POLICIES
+--------------------------
+2026-10-21 13:07:19 SYS             SELECT           APP_CONF                                                                                                                         CLIENTES               0
+POL_AUD_DATOS_CONF
+
+2026-10-21 13:07:19 SYS             SELECT           APP_CONF                                                                                                                         CLIENTES               0
+POL_AUD_DATOS_CONF
+
+2026-10-21 13:07:19 SYS             SELECT           APP_CONF                                                                                                                         CLIENTES               0
+POL_AUD_DATOS_CONF
+
+2026-10-21 13:07:19 SYS             SELECT           APP_CONF                                                                                                                         CLIENTES               0
+POL_AUD_DATOS_CONF
+
+2026-10-21 13:07:18 SYS             SELECT           APP_CONF                                                                                                                         CLIENTES               0
+POL_AUD_DATOS_CONF
+
+2026-10-21 13:05:02 SYS             SELECT           APP_CONF                                                                                                                         CLIENTES               0
+ORA_SECURECONFIG, POL_AUD_
+DATOS_CONF
+
+2026-10-21 13:03:25 U_ANALISTA      LOGON                                                                                                                                                                28000
+ORA_LOGON_FAILURES
+
+2026-10-21 13:03:25 U_ANALISTA      LOGON                                                                                                                                                                 1017
+ORA_LOGON_FAILURES
+
+2026-10-21 13:03:24 U_ANALISTA      LOGON                                                                                                                                                                 1017
+ORA_LOGON_FAILURES
+
+2026-10-21 13:03:22 U_ANALISTA      LOGON                                                                                                                                                                 1017
+ORA_LOGON_FAILURES
+
+2026-10-21 13:03:21 U_DESARROLLADOR SELECT           APP_CONF                                                                                                                         CLIENTES            2004
+POL_AUD_DATOS_CONF
+
+2026-10-21 13:03:21 U_OPERADOR      SELECT           APP_CONF                                                                                                                         CLIENTES               0
+POL_AUD_DATOS_CONF
+
+2026-10-21 13:03:21 U_OPERADOR      DELETE           APP_CONF                                                                                                                         CLIENTES               0
+POL_AUD_DATOS_CONF
+
+2026-10-21 13:03:21 U_OPERADOR      DELETE           APP_CONF                                                                                                                         CLIENTES            2004
+POL_AUD_DATOS_CONF
+
+2026-10-21 13:03:21 U_OPERADOR      SELECT           APP_CONF                                                                                                                         CLIENTES               0
+POL_AUD_DATOS_CONF
+
+2026-10-21 13:03:21 U_OPERADOR      UPDATE           APP_CONF                                                                                                                         CLIENTES               0
+POL_AUD_DATOS_CONF
+
+2026-10-21 13:03:20 U_ANALISTA      SELECT           APP_CONF                                                                                                                         CLIENTES           28081
+POL_AUD_DATOS_CONF
+
+2026-10-21 13:03:20 U_ANALISTA      UPDATE           APP_CONF                                                                                                                         CLIENTES            2004
+POL_AUD_DATOS_CONF
+
+2026-10-21 13:03:20 U_ANALISTA      SELECT           APP_CONF                                                                                                                         CLIENTES               0
+POL_AUD_DATOS_CONF
+
+2026-10-21 13:03:20 U_ANALISTA      SELECT           APP_CONF                                                                                                                         CLIENTES               0
+POL_AUD_DATOS_CONF
+
+2026-10-21 13:03:20 SYS             SELECT           APP_CONF                                                                                                                         CLIENTES               0
+POL_AUD_DATOS_CONF
+
+2026-10-21 13:03:20 SYS             INSERT           APP_CONF                                                                                                                         CLIENTES               0
+POL_AUD_DATOS_CONF
+
+2026-10-21 13:00:49 U_ANALISTA      LOGON                                                                                                                                                                28000
+ORA_LOGON_FAILURES
+
+2026-10-21 13:00:49 U_ANALISTA      LOGON                                                                                                                                                                 1017
+ORA_LOGON_FAILURES
+
+2026-10-21 13:00:47 U_ANALISTA      LOGON                                                                                                                                                                 1017
+ORA_LOGON_FAILURES
+
+
+25 filas seleccionadas.
+
+
+ACTION_NAME      RETURN_CODE    EVENTOS
+---------------- ----------- ----------
+SELECT                     0         32
+ALTER USER                 0         18
+GRANT                      0         14
+CREATE USER                0          7
+LOGON                   1017          6
+AUDIT                      0          6
+CREATE ROLE                0          5
+CREATE TABLE               0          4
+EXECUTE                    0          4
+GRANT                   1919          4
+CREATE AUDIT POL           0          3
+ICY
+
+GRANT                   1917          3
+UPDATE                  2004          2
+UPDATE                     0          2
+DELETE                  2004          2
+SELECT                  2004          2
+CREATE PROCEDURE           0          2
+LOGON                  28000          2
+SELECT                 28081          2
+DELETE                     0          2
+PURGE DBA_RECYCL           0          1
+EBIN
+
+CREATE PROFILE             0          1
+INSERT                     0          1
+CREATE FUNCTION            0          1
+
+24 filas seleccionadas.
+
+
+===============================================================
+[A.8.20] Seguridad de redes - Sesiones TCP cifradas (PRB-18)
+Esperado: sesiones remotas con "AES256 Encryption" y "SHA256 Crypto"
+(deje SQL Developer conectado por TCP mientras corre este script)
+===============================================================
+
+USERNAME             NETWORK_SERVICE_BANNER
+-------------------- --------------------------------------------------------------------------------
+SYS                  AES256 Encryption service adapter for 64-bit Windows: Version 21.0.1.0.0 - Produ
+                     ction
+
+SYS                  SHA256 Crypto-checksumming service adapter for 64-bit Windows: Version 21.0.1.0.
+                     0 - Production
+
+
+2 filas seleccionadas.
+
+
+================================================================
+FIN DE LA VERIFICACION
+================================================================

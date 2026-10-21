@@ -1,0 +1,270 @@
+
+Envío a cola de espera iniciado en el archivo log: evidencia_backup.log
+
+Recovery Manager 21.3.0.0.0
+
+RMAN> 
+conectado a la base de datos de destino: XE (DBID=3107141264)
+
+RMAN> 
+RMAN> # =====================================================================
+2> # 10b_backup_cifrado.rman
+3> # Controles: A.8.13 (copias de seguridad), A.8.24 (criptografia),
+4> #            A.8.12 (prevencion de fuga: un backup robado no es legible)
+5> # Tarea DBA: T-06 Backup cifrado
+6> #
+7> # Ejecutar en PowerShell (separacion de funciones con SYSBACKUP):
+8> #   rman target '"c##backup_op/Bk7#Rm9$Xp2026 as sysbackup"' cmdfile=10b_backup_cifrado.rman log=evidencia_backup.log
+9> # Alternativa simple:
+10> #   rman target / cmdfile=10b_backup_cifrado.rman log=evidencia_backup.log
+11> #
+12> # Requiere: keystore TDE abierto (script 01) y ARCHIVELOG (script 10a).
+13> # Cifrado TRANSPARENTE: usa la llave maestra del keystore TDE.
+14> # =====================================================================
+15> 
+16> CONFIGURE ENCRYPTION FOR DATABASE ON;
+se utiliza el archivo de control de la base de datos destino en lugar del catálogo de recuperación
+parámetros de configuración de RMAN de antiguos:
+CONFIGURE ENCRYPTION FOR DATABASE OFF;
+parámetros de configuración de RMAN nuevos:
+CONFIGURE ENCRYPTION FOR DATABASE ON;
+se han almacenado correctamente los parámetros de configuración de RMAN nuevos
+
+RMAN> CONFIGURE ENCRYPTION ALGORITHM 'AES256';
+parámetros de configuración de RMAN nuevos:
+CONFIGURE ENCRYPTION ALGORITHM 'AES256';
+se han almacenado correctamente los parámetros de configuración de RMAN nuevos
+
+RMAN> CONFIGURE CONTROLFILE AUTOBACKUP ON;
+parámetros de configuración de RMAN de antiguos:
+CONFIGURE CONTROLFILE AUTOBACKUP ON;
+parámetros de configuración de RMAN nuevos:
+CONFIGURE CONTROLFILE AUTOBACKUP ON;
+se han almacenado correctamente los parámetros de configuración de RMAN nuevos
+
+RMAN> CONFIGURE RETENTION POLICY TO REDUNDANCY 2;
+parámetros de configuración de RMAN de antiguos:
+CONFIGURE RETENTION POLICY TO RECOVERY WINDOW OF 7 DAYS;
+parámetros de configuración de RMAN nuevos:
+CONFIGURE RETENTION POLICY TO REDUNDANCY 2;
+se han almacenado correctamente los parámetros de configuración de RMAN nuevos
+
+RMAN> CONFIGURE BACKUP OPTIMIZATION ON;
+parámetros de configuración de RMAN nuevos:
+CONFIGURE BACKUP OPTIMIZATION ON;
+se han almacenado correctamente los parámetros de configuración de RMAN nuevos
+
+RMAN> 
+RMAN> SHOW ALL;
+Los parámetros de configuración de RMAN para la base de datos con db_unique_name XE son:
+CONFIGURE RETENTION POLICY TO REDUNDANCY 2;
+CONFIGURE BACKUP OPTIMIZATION ON;
+CONFIGURE DEFAULT DEVICE TYPE TO DISK; # default
+CONFIGURE CONTROLFILE AUTOBACKUP ON;
+CONFIGURE CONTROLFILE AUTOBACKUP FORMAT FOR DEVICE TYPE DISK TO '%F'; # default
+CONFIGURE DEVICE TYPE DISK PARALLELISM 1 BACKUP TYPE TO COMPRESSED BACKUPSET;
+CONFIGURE DATAFILE BACKUP COPIES FOR DEVICE TYPE DISK TO 1; # default
+CONFIGURE ARCHIVELOG BACKUP COPIES FOR DEVICE TYPE DISK TO 1; # default
+CONFIGURE CHANNEL DEVICE TYPE DISK FORMAT   'C:\tld\backup\%d_%T_%U.bkp';
+CONFIGURE MAXSETSIZE TO UNLIMITED; # default
+CONFIGURE ENCRYPTION FOR DATABASE ON;
+CONFIGURE ENCRYPTION ALGORITHM 'AES256';
+CONFIGURE COMPRESSION ALGORITHM 'BASIC' AS OF RELEASE 'DEFAULT' OPTIMIZE FOR LOAD TRUE;
+CONFIGURE RMAN OUTPUT TO KEEP FOR 7 DAYS; # default
+CONFIGURE ARCHIVELOG DELETION POLICY TO NONE; # default
+CONFIGURE SNAPSHOT CONTROLFILE NAME TO 'C:\APP\JEIMY\PRODUCT\21C\DATABASE\SNCFXE.ORA'; # default
+
+RMAN> 
+RMAN> BACKUP AS COMPRESSED BACKUPSET DATABASE PLUS ARCHIVELOG TAG 'BKP_CONF_AES256';
+
+Empezando backup a las 21/10/26
+log actual archivado
+canal asignado: ORA_DISK_1
+canal ORA_DISK_1: SID=150 tipo de dispositivo=DISK
+omitiendo los archive logs del thread 1 de la secuencia 116 a 124; ya tienen una copia de seguridad
+canal ORA_DISK_1: iniciando juego de copias de seguridad de archive log comprimido
+canal ORA_DISK_1: especificando archive log(s) en el juego de copias de seguridad
+thread de archive log de entrada=1 secuencia=125 RECID=10 STAMP=1247226573
+thread de archive log de entrada=1 secuencia=126 RECID=11 STAMP=1247227435
+thread de archive log de entrada=1 secuencia=127 RECID=12 STAMP=1247230193
+canal ORA_DISK_1: iniciando parte 1 en 21/10/26
+canal ORA_DISK_1: finalizando parte 1 en 21/10/26
+manejador de parte=C:\TLD\BACKUP\XE_20261021_0M55EE7I_22_1_1.BKP etiqueta=BKP_CONF_AES256 comentario=NONE
+canal ORA_DISK_1: juego de copias de seguridad terminado, tiempo transcurrido: 00:00:07
+Se ha finalizado backup a las 21/10/26
+
+Empezando backup a las 21/10/26
+usando el canal ORA_DISK_1
+omitiendo archivo de datos 5; ya se ha realizado la copia de seguridad 3 veces
+omitiendo archivo de datos 6; ya se ha realizado la copia de seguridad 3 veces
+omitiendo archivo de datos 8; ya se ha realizado la copia de seguridad 3 veces
+canal ORA_DISK_1: iniciando juego de copias de seguridad de archivo de datos completo comprimido
+canal ORA_DISK_1: especificando archivo(s) de datos en el juego de copias de seguridad
+número de archivo de datos de entrada=00001 nombre=C:\APP\JEIMY\PRODUCT\21C\ORADATA\XE\SYSTEM01.DBF
+número de archivo de datos de entrada=00003 nombre=C:\APP\JEIMY\PRODUCT\21C\ORADATA\XE\SYSAUX01.DBF
+número de archivo de datos de entrada=00004 nombre=C:\APP\JEIMY\PRODUCT\21C\ORADATA\XE\UNDOTBS01.DBF
+número de archivo de datos de entrada=00007 nombre=C:\APP\JEIMY\PRODUCT\21C\ORADATA\XE\USERS01.DBF
+canal ORA_DISK_1: iniciando parte 1 en 21/10/26
+canal ORA_DISK_1: finalizando parte 1 en 21/10/26
+manejador de parte=C:\TLD\BACKUP\XE_20261021_0N55EE7P_23_1_1.BKP etiqueta=TAG20261021T125001 comentario=NONE
+canal ORA_DISK_1: juego de copias de seguridad terminado, tiempo transcurrido: 00:01:06
+canal ORA_DISK_1: iniciando juego de copias de seguridad de archivo de datos completo comprimido
+canal ORA_DISK_1: especificando archivo(s) de datos en el juego de copias de seguridad
+número de archivo de datos de entrada=00010 nombre=C:\APP\JEIMY\PRODUCT\21C\ORADATA\XE\XEPDB1\SYSAUX01.DBF
+número de archivo de datos de entrada=00009 nombre=C:\APP\JEIMY\PRODUCT\21C\ORADATA\XE\XEPDB1\SYSTEM01.DBF
+número de archivo de datos de entrada=00011 nombre=C:\APP\JEIMY\PRODUCT\21C\ORADATA\XE\XEPDB1\UNDOTBS01.DBF
+número de archivo de datos de entrada=00015 nombre=C:\APP\JEIMY\PRODUCT\21C\ORADATA\XE\XEPDB1\TS_CONF_ENC01.DBF
+número de archivo de datos de entrada=00013 nombre=C:\LAB\NUEVO_DISCO\TS_PRUEBA01.DBF
+número de archivo de datos de entrada=00014 nombre=C:\LAB\NUEVO_DISCO\TS_PRUEBA02.DBF
+número de archivo de datos de entrada=00012 nombre=C:\LAB\NUEVO_DISCO\USERS01.DBF
+canal ORA_DISK_1: iniciando parte 1 en 21/10/26
+canal ORA_DISK_1: finalizando parte 1 en 21/10/26
+manejador de parte=C:\TLD\BACKUP\XE_20261021_0O55EE9R_24_1_1.BKP etiqueta=TAG20261021T125001 comentario=NONE
+canal ORA_DISK_1: juego de copias de seguridad terminado, tiempo transcurrido: 00:00:25
+Se ha finalizado backup a las 21/10/26
+
+Empezando backup a las 21/10/26
+log actual archivado
+usando el canal ORA_DISK_1
+canal ORA_DISK_1: iniciando juego de copias de seguridad de archive log comprimido
+canal ORA_DISK_1: especificando archive log(s) en el juego de copias de seguridad
+thread de archive log de entrada=1 secuencia=128 RECID=13 STAMP=1247230292
+canal ORA_DISK_1: iniciando parte 1 en 21/10/26
+canal ORA_DISK_1: finalizando parte 1 en 21/10/26
+manejador de parte=C:\TLD\BACKUP\XE_20261021_0P55EEAK_25_1_1.BKP etiqueta=BKP_CONF_AES256 comentario=NONE
+canal ORA_DISK_1: juego de copias de seguridad terminado, tiempo transcurrido: 00:00:01
+Se ha finalizado backup a las 21/10/26
+
+Empezando Control File and SPFILE Autobackup a las 21/10/26
+manejador de parte=C:\LAB\FRA\XE\AUTOBACKUP\2026_10_21\O1_MF_S_1247230294_OFL2FPDK_.BKP comentario=NONE
+Se ha finalizado Control File and SPFILE Autobackup a las 21/10/26
+
+RMAN> 
+RMAN> # Prueba de restaurabilidad sin restaurar realmente (PRB-17)
+2> RESTORE DATABASE VALIDATE;
+Empezando restore a las 21/10/26
+usando el canal ORA_DISK_1
+
+canal ORA_DISK_1: iniciando validación del juego de copias de seguridad del archivo de datos
+canal ORA_DISK_1: leyendo desde la parte de copia de seguridad C:\TLD\BACKUP\XE_20261014_0I54SRVH_18_1_1.BKP
+canal ORA_DISK_1: manejador de parte=C:\TLD\BACKUP\XE_20261014_0I54SRVH_18_1_1.BKP etiqueta=TAG20261014T205248
+canal ORA_DISK_1: parte 1 de la copia de seguridad restaurada
+canal ORA_DISK_1: validación terminada, tiempo transcurrido: 00:00:25
+canal ORA_DISK_1: iniciando validación del juego de copias de seguridad del archivo de datos
+canal ORA_DISK_1: leyendo desde la parte de copia de seguridad C:\TLD\BACKUP\XE_20261021_0N55EE7P_23_1_1.BKP
+canal ORA_DISK_1: manejador de parte=C:\TLD\BACKUP\XE_20261021_0N55EE7P_23_1_1.BKP etiqueta=TAG20261021T125001
+canal ORA_DISK_1: parte 1 de la copia de seguridad restaurada
+canal ORA_DISK_1: validación terminada, tiempo transcurrido: 00:01:05
+canal ORA_DISK_1: iniciando validación del juego de copias de seguridad del archivo de datos
+canal ORA_DISK_1: leyendo desde la parte de copia de seguridad C:\TLD\BACKUP\XE_20261021_0O55EE9R_24_1_1.BKP
+canal ORA_DISK_1: manejador de parte=C:\TLD\BACKUP\XE_20261021_0O55EE9R_24_1_1.BKP etiqueta=TAG20261021T125001
+canal ORA_DISK_1: parte 1 de la copia de seguridad restaurada
+canal ORA_DISK_1: validación terminada, tiempo transcurrido: 00:00:25
+Se ha finalizado restore a las 21/10/26
+
+RMAN> 
+RMAN> CROSSCHECK BACKUP;
+usando el canal ORA_DISK_1
+comprobación cruzada de parte de copia de seguridad: se ha detectado que es 'AVAILABLE'
+manejador de parte de copia de seguridad=C:\TLD\BACKUP\XE_20261001_0153QI3J_1_1_1.BKP RECID=1 STAMP=1245530228
+comprobación cruzada de parte de copia de seguridad: se ha detectado que es 'AVAILABLE'
+manejador de parte de copia de seguridad=C:\TLD\BACKUP\XE_20261001_0253QI5B_2_1_1.BKP RECID=2 STAMP=1245530284
+comprobación cruzada de parte de copia de seguridad: se ha detectado que es 'AVAILABLE'
+manejador de parte de copia de seguridad=C:\TLD\BACKUP\XE_20261001_0353QI65_3_1_1.BKP RECID=3 STAMP=1245530309
+comprobación cruzada de parte de copia de seguridad: se ha detectado que es 'AVAILABLE'
+manejador de parte de copia de seguridad=C:\TLD\BACKUP\XE_20261001_0453QI6V_4_1_1.BKP RECID=4 STAMP=1245530336
+comprobación cruzada de parte de copia de seguridad: se ha detectado que es 'AVAILABLE'
+manejador de parte de copia de seguridad=C:\TLD\BACKUP\XE_20261001_0553QI71_5_1_1.BKP RECID=5 STAMP=1245530337
+comprobación cruzada de parte de copia de seguridad: se ha detectado que es 'AVAILABLE'
+manejador de parte de copia de seguridad=C:\APP\JEIMY\PRODUCT\21C\DBHOMEXE\DATABASE\C-3107141264-20261001-00 RECID=6 STAMP=1245530338
+comprobación cruzada de parte de copia de seguridad: se ha detectado que es 'AVAILABLE'
+manejador de parte de copia de seguridad=C:\TLD\BACKUP\XE_20261001_0753QKAO_7_1_1.BKP RECID=7 STAMP=1245532504
+comprobación cruzada de parte de copia de seguridad: se ha detectado que es 'AVAILABLE'
+manejador de parte de copia de seguridad=C:\TLD\BACKUP\XE_20261001_0853QKAQ_8_1_1.BKP RECID=8 STAMP=1245532506
+comprobación cruzada de parte de copia de seguridad: se ha detectado que es 'AVAILABLE'
+manejador de parte de copia de seguridad=C:\TLD\BACKUP\XE_20261001_0953QKCH_9_1_1.BKP RECID=9 STAMP=1245532561
+comprobación cruzada de parte de copia de seguridad: se ha detectado que es 'AVAILABLE'
+manejador de parte de copia de seguridad=C:\TLD\BACKUP\XE_20261001_0A53QKD0_10_1_1.BKP RECID=10 STAMP=1245532576
+comprobación cruzada de parte de copia de seguridad: se ha detectado que es 'AVAILABLE'
+manejador de parte de copia de seguridad=C:\TLD\BACKUP\XE_20261001_0B53QKDF_11_1_1.BKP RECID=11 STAMP=1245532592
+comprobación cruzada de parte de copia de seguridad: se ha detectado que es 'AVAILABLE'
+manejador de parte de copia de seguridad=C:\TLD\BACKUP\XE_20261001_0C53QKDH_12_1_1.BKP RECID=12 STAMP=1245532594
+comprobación cruzada de parte de copia de seguridad: se ha detectado que es 'AVAILABLE'
+manejador de parte de copia de seguridad=C:\TLD\BACKUP\XE_20261001_0D53QKDJ_13_1_1.BKP RECID=13 STAMP=1245532595
+comprobación cruzada de parte de copia de seguridad: se ha detectado que es 'AVAILABLE'
+manejador de parte de copia de seguridad=C:\APP\JEIMY\PRODUCT\21C\DBHOMEXE\DATABASE\C-3107141264-20261001-01 RECID=14 STAMP=1245532596
+comprobación cruzada de parte de copia de seguridad: se ha detectado que es 'AVAILABLE'
+manejador de parte de copia de seguridad=C:\TLD\BACKUP\XE_20261014_0F54SRSG_15_1_1.BKP RECID=15 STAMP=1246654352
+comprobación cruzada de parte de copia de seguridad: se ha detectado que es 'AVAILABLE'
+manejador de parte de copia de seguridad=C:\TLD\BACKUP\XE_20261014_0G54SRT0_16_1_1.BKP RECID=16 STAMP=1246654368
+comprobación cruzada de parte de copia de seguridad: se ha detectado que es 'AVAILABLE'
+manejador de parte de copia de seguridad=C:\TLD\BACKUP\XE_20261014_0H54SRUN_17_1_1.BKP RECID=17 STAMP=1246654424
+comprobación cruzada de parte de copia de seguridad: se ha detectado que es 'AVAILABLE'
+manejador de parte de copia de seguridad=C:\TLD\BACKUP\XE_20261014_0I54SRVH_18_1_1.BKP RECID=18 STAMP=1246654449
+comprobación cruzada de parte de copia de seguridad: se ha detectado que es 'AVAILABLE'
+manejador de parte de copia de seguridad=C:\TLD\BACKUP\XE_20261014_0J54SS0A_19_1_1.BKP RECID=19 STAMP=1246654474
+comprobación cruzada de parte de copia de seguridad: se ha detectado que es 'AVAILABLE'
+manejador de parte de copia de seguridad=C:\LAB\FRA\XE\AUTOBACKUP\2026_10_14\O1_MF_S_1246654475_OF0J3CY2_.BKP RECID=20 STAMP=1246654475
+comprobación cruzada de parte de copia de seguridad: se ha detectado que es 'AVAILABLE'
+manejador de parte de copia de seguridad=C:\LAB\FRA\XE\AUTOBACKUP\2026_10_21\O1_MF_S_1247228021_OFL06OXP_.BKP RECID=21 STAMP=1247228021
+comprobación cruzada de parte de copia de seguridad: se ha detectado que es 'AVAILABLE'
+manejador de parte de copia de seguridad=C:\TLD\BACKUP\XE_20261021_0M55EE7I_22_1_1.BKP RECID=22 STAMP=1247230194
+comprobación cruzada de parte de copia de seguridad: se ha detectado que es 'AVAILABLE'
+manejador de parte de copia de seguridad=C:\TLD\BACKUP\XE_20261021_0N55EE7P_23_1_1.BKP RECID=23 STAMP=1247230202
+comprobación cruzada de parte de copia de seguridad: se ha detectado que es 'AVAILABLE'
+manejador de parte de copia de seguridad=C:\TLD\BACKUP\XE_20261021_0O55EE9R_24_1_1.BKP RECID=24 STAMP=1247230268
+comprobación cruzada de parte de copia de seguridad: se ha detectado que es 'AVAILABLE'
+manejador de parte de copia de seguridad=C:\TLD\BACKUP\XE_20261021_0P55EEAK_25_1_1.BKP RECID=25 STAMP=1247230292
+comprobación cruzada de parte de copia de seguridad: se ha detectado que es 'AVAILABLE'
+manejador de parte de copia de seguridad=C:\LAB\FRA\XE\AUTOBACKUP\2026_10_21\O1_MF_S_1247230294_OFL2FPDK_.BKP RECID=26 STAMP=1247230294
+26 objetos con comprobación cruzada
+
+
+RMAN> LIST BACKUP SUMMARY;
+
+Lista de Copias de Seguridad
+===============
+Clave     TY LV S Tipo de Dispositivo Hora de Finalización Número de Parte Número de Copia Comprimido Etiqueta
+------- -- -- - ----------- -------------------- ------- ------- ---------- ---
+1       B  0  A DISK        01/10/26             1       1       YES        EST002_XEREALMIMI
+2       B  0  A DISK        01/10/26             1       1       YES        EST002_XEREALMIMI
+3       B  0  A DISK        01/10/26             1       1       YES        EST002_XEREALMIMI
+4       B  F  A DISK        01/10/26             1       1       YES        EST002_XEREALMIMI_CF
+5       B  F  A DISK        01/10/26             1       1       YES        EST002_XEREALMIMI_SPFILE
+6       B  F  A DISK        01/10/26             1       1       YES        TAG20261001T203858
+7       B  A  A DISK        01/10/26             1       1       YES        EST002_XEREALMIMI
+8       B  0  A DISK        01/10/26             1       1       YES        TAG20261001T211506
+9       B  0  A DISK        01/10/26             1       1       YES        TAG20261001T211506
+10      B  0  A DISK        01/10/26             1       1       YES        TAG20261001T211506
+11      B  A  A DISK        01/10/26             1       1       YES        EST002_XEREALMIMI
+12      B  F  A DISK        01/10/26             1       1       YES        EST002_XEREALMIMI_CF
+13      B  F  A DISK        01/10/26             1       1       YES        EST002_XEREALMIMI_SPFILE
+14      B  F  A DISK        01/10/26             1       1       YES        TAG20261001T211636
+15      B  A  A DISK        14/10/26             1       1       YES        TAG20261014T205232
+16      B  F  A DISK        14/10/26             1       1       YES        TAG20261014T205248
+17      B  F  A DISK        14/10/26             1       1       YES        TAG20261014T205248
+18      B  F  A DISK        14/10/26             1       1       YES        TAG20261014T205248
+19      B  A  A DISK        14/10/26             1       1       YES        TAG20261014T205434
+20      B  F  A DISK        14/10/26             1       1       YES        TAG20261014T205435
+21      B  F  A DISK        21/10/26             1       1       YES        TAG20261021T121341
+22      B  A  A DISK        21/10/26             1       1       YES        BKP_CONF_AES256
+23      B  F  A DISK        21/10/26             1       1       YES        TAG20261021T125001
+24      B  F  A DISK        21/10/26             1       1       YES        TAG20261021T125001
+25      B  A  A DISK        21/10/26             1       1       YES        BKP_CONF_AES256
+26      B  F  A DISK        21/10/26             1       1       YES        TAG20261021T125134
+
+RMAN> **fin de archivo**
+
+RMAN> 
+RMAN-00571: ===========================================================
+RMAN-00569: =============== ERROR MESSAGE STACK FOLLOWS ===============
+RMAN-00571: ===========================================================
+RMAN-00558: se ha encontrado un error al analizar los comandos de entrada
+RMAN-01009: error de sintaxis: se ha encontrado "identifier": se esperaba uno de: "off, to"
+RMAN-01008: el identificador erróneo era: OFFSPOOL
+RMAN-01007: en la línea 1 columna 11 archivo: standard input
+
+RMAN> 
+RMAN> 
+RMAN> 
+RMAN> 

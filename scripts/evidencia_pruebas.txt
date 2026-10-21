@@ -1,0 +1,395 @@
+SQL> 
+SQL> COLUMN cedula   FORMAT A12
+SQL> COLUMN nombre   FORMAT A30
+SQL> COLUMN email    FORMAT A28
+SQL> COLUMN telefono FORMAT A9
+SQL> COLUMN tarjeta  FORMAT A20
+SQL> COLUMN provincia FORMAT A12
+SQL> 
+SQL> -- =====================================================================
+SQL> -- ANALISTA (rol de solo lectura, datos enmascarados, filtrado por VPD)
+SQL> -- =====================================================================
+SQL> CONNECT u_analista/"&PWD_ANALISTA"@&SRV
+Conectado.
+SQL> 
+SQL> PROMPT >>> PRB-04 [A.8.11] Analista consulta datos confidenciales
+>>> PRB-04 [A.8.11] Analista consulta datos confidenciales
+SQL> PROMPT	Esperado: cedula *****NNNN, salario 0, tarjeta ************NNNN,
+Esperado: cedula *****NNNN, salario 0, tarjeta ************NNNN,
+SQL> PROMPT		  telefono ****NNNN, email xxxx@dominio
+telefono ****NNNN, email xxxx@dominio
+SQL> SELECT cedula, nombre, email, telefono, salario, tarjeta
+  2  FROM   app_conf.clientes
+  3  WHERE  ROWNUM <= 5;
+
+CEDULA       NOMBRE                         EMAIL                        TELEFONO     SALARIO TARJETA
+------------ ------------------------------ ---------------------------- --------- ---------- --------------------
+*****0456    Zuleyka Prueba Confidencial    xxxx@correo.cr               ****7777           0 ************4444
+*****3701    Sofia Vargas Araya             xxxx@correo.cr               ****6295           0 ************4187
+*****1969    Camila Alfaro Rojas            xxxx@correo.cr               ****1355           0 ************3103
+*****0237    Sofia Vargas Araya             xxxx@correo.cr               ****6415           0 ************2019
+*****8505    Camila Alfaro Rojas            xxxx@correo.cr               ****1475           0 ************0935
+
+5 filas seleccionadas.
+
+SQL> 
+SQL> PROMPT >>> PRB-05 [A.8.3] Analista solo ve su region (VPD)
+>>> PRB-05 [A.8.3] Analista solo ve su region (VPD)
+SQL> PROMPT	Esperado: una sola fila con PROVINCIA = HEREDIA
+Esperado: una sola fila con PROVINCIA = HEREDIA
+SQL> SELECT provincia, COUNT(*) AS clientes FROM app_conf.clientes GROUP BY provincia;
+
+PROVINCIA      CLIENTES
+------------ ----------
+HEREDIA              16
+
+1 fila seleccionada.
+
+SQL> 
+SQL> PROMPT >>> PRB-06 [A.5.15] Analista intenta modificar datos
+>>> PRB-06 [A.5.15] Analista intenta modificar datos
+SQL> PROMPT	Esperado: ORA-01031 privilegios insuficientes
+Esperado: ORA-01031 privilegios insuficientes
+SQL> UPDATE app_conf.clientes SET salario = 0 WHERE ROWNUM = 1;
+UPDATE app_conf.clientes SET salario = 0 WHERE ROWNUM = 1
+                *
+ERROR en línea 1:
+ORA-01031: privilegios insuficientes
+
+
+SQL> 
+SQL> PROMPT >>> PRB-06b [A.8.12] Analista intenta copiar los datos a una tabla propia
+>>> PRB-06b [A.8.12] Analista intenta copiar los datos a una tabla propia
+SQL> PROMPT	Esperado: rechazo. ORA-28081 (Data Redaction impide copiar columnas
+Esperado: rechazo. ORA-28081 (Data Redaction impide copiar columnas
+SQL> PROMPT		  ocultas) u ORA-01031 (sin privilegio CREATE TABLE)
+ocultas) u ORA-01031 (sin privilegio CREATE TABLE)
+SQL> CREATE TABLE copia_clientes AS SELECT * FROM app_conf.clientes;
+CREATE TABLE copia_clientes AS SELECT * FROM app_conf.clientes
+                                      *
+ERROR en línea 1:
+ORA-28081: Privilegios insuficientes: el comando hace referencia a un objeto oculto.
+
+
+SQL> 
+SQL> PROMPT >>> PRB-07 [A.5.33] Analista intenta leer la auditoria
+>>> PRB-07 [A.5.33] Analista intenta leer la auditoria
+SQL> PROMPT	Esperado: ORA-00942 la tabla o vista no existe
+Esperado: ORA-00942 la tabla o vista no existe
+SQL> SELECT COUNT(*) FROM unified_audit_trail;
+SELECT COUNT(*) FROM unified_audit_trail
+                     *
+ERROR en línea 1:
+ORA-00942: la tabla o vista no existe
+
+
+SQL> 
+SQL> -- =====================================================================
+SQL> -- OPERADOR (lectura/escritura, ve datos reales, sin DELETE directo)
+SQL> -- =====================================================================
+SQL> CONNECT u_operador/"&PWD_OPERADOR"@&SRV
+Conectado.
+SQL> 
+SQL> PROMPT >>> PRB-08 [A.5.15 / A.8.11] Operador ve datos completos y actualiza
+>>> PRB-08 [A.5.15 / A.8.11] Operador ve datos completos y actualiza
+SQL> PROMPT	Esperado: datos sin enmascarar; UPDATE de 1 fila exitoso
+Esperado: datos sin enmascarar; UPDATE de 1 fila exitoso
+SQL> SELECT cedula, nombre, salario, tarjeta FROM app_conf.clientes
+  2  WHERE  cedula = '901230456';
+
+CEDULA       NOMBRE                            SALARIO TARJETA
+------------ ------------------------------ ---------- --------------------
+901230456    Zuleyka Prueba Confidencial       1850000 4111222233334444
+
+1 fila seleccionada.
+
+SQL> UPDATE app_conf.clientes SET telefono = '88887777' WHERE cedula = '901230456';
+
+1 fila actualizada.
+
+SQL> COMMIT;
+
+Confirmación terminada.
+
+SQL> 
+SQL> PROMPT >>> PRB-09 [A.8.10] Operador intenta DELETE directo
+>>> PRB-09 [A.8.10] Operador intenta DELETE directo
+SQL> PROMPT	Esperado: ORA-01031 privilegios insuficientes
+Esperado: ORA-01031 privilegios insuficientes
+SQL> DELETE FROM app_conf.clientes WHERE cedula = '305550111';
+DELETE FROM app_conf.clientes WHERE cedula = '305550111'
+                     *
+ERROR en línea 1:
+ORA-01031: privilegios insuficientes
+
+
+SQL> 
+SQL> PROMPT >>> PRB-09b [A.8.10] Supresion controlada por procedimiento
+>>> PRB-09b [A.8.10] Supresion controlada por procedimiento
+SQL> PROMPT	Esperado: PL/SQL procedure successfully completed
+Esperado: PL/SQL procedure successfully completed
+SQL> EXEC app_conf.prc_suprimir_titular('305550111', 'Solicitud de supresion del titular (Ley 8968)');
+
+Procedimiento PL/SQL terminado correctamente.
+
+SQL> SELECT COUNT(*) AS sigue_existiendo FROM app_conf.clientes WHERE cedula = '305550111';
+
+SIGUE_EXISTIENDO
+----------------
+               0
+
+1 fila seleccionada.
+
+SQL> 
+SQL> -- =====================================================================
+SQL> -- DESARROLLADOR (solo entorno DEV con datos sinteticos)
+SQL> -- =====================================================================
+SQL> CONNECT u_desarrollador/"&PWD_DEV"@&SRV
+Conectado.
+SQL> 
+SQL> PROMPT >>> PRB-20 [A.8.33 / A.8.11] Desarrollador sin acceso a produccion
+>>> PRB-20 [A.8.33 / A.8.11] Desarrollador sin acceso a produccion
+SQL> PROMPT	Esperado: ORA-00942 en PROD; datos sinteticos en DEV
+Esperado: ORA-00942 en PROD; datos sinteticos en DEV
+SQL> SELECT COUNT(*) FROM app_conf.clientes;
+SELECT COUNT(*) FROM app_conf.clientes
+                              *
+ERROR en línea 1:
+ORA-00942: la tabla o vista no existe
+
+
+SQL> SELECT cedula, nombre, email, tarjeta FROM app_conf_dev.clientes WHERE ROWNUM <= 5;
+
+CEDULA       NOMBRE                         EMAIL                        TARJETA
+------------ ------------------------------ ---------------------------- --------------------
+000000001    Cliente Prueba 1               cliente1@ejemplo.test        0000000000000001
+000000002    Cliente Prueba 2               cliente2@ejemplo.test        0000000000000002
+000000003    Cliente Prueba 3               cliente3@ejemplo.test        0000000000000003
+000000004    Cliente Prueba 4               cliente4@ejemplo.test        0000000000000004
+000000005    Cliente Prueba 5               cliente5@ejemplo.test        0000000000000005
+
+5 filas seleccionadas.
+
+SQL> 
+SQL> -- =====================================================================
+SQL> -- PRB-10 [A.8.5] BLOQUEO POR INTENTOS FALLIDOS
+SQL> -- Esperado: ORA-01017 tres veces y luego ORA-28000 (cuenta bloqueada)
+SQL> -- aunque la cuarta contrasena sea la correcta.
+SQL> -- =====================================================================
+SQL> PROMPT >>> PRB-10 intento 1 (contrasena incorrecta)
+>>> PRB-10 intento 1 (contrasena incorrecta)
+SQL> CONNECT u_analista/"Incorrecta#01Ab"@&SRV
+ERROR:
+ORA-01017: nombre de usuario/contraseña no válidos; conexión denegada
+
+
+Advertencia: ¡Ya no está conectado a ORACLE!
+SQL> PROMPT >>> PRB-10 intento 2 (contrasena incorrecta)
+>>> PRB-10 intento 2 (contrasena incorrecta)
+SQL> CONNECT u_analista/"Incorrecta#02Ab"@&SRV
+ERROR:
+ORA-01017: nombre de usuario/contraseña no válidos; conexión denegada
+
+
+SQL> PROMPT >>> PRB-10 intento 3 (contrasena incorrecta)
+>>> PRB-10 intento 3 (contrasena incorrecta)
+SQL> CONNECT u_analista/"Incorrecta#03Ab"@&SRV
+ERROR:
+ORA-01017: nombre de usuario/contraseña no válidos; conexión denegada
+
+
+SQL> PROMPT >>> PRB-10 intento 4 (contrasena CORRECTA) -> esperado ORA-28000
+>>> PRB-10 intento 4 (contrasena CORRECTA) -> esperado ORA-28000
+SQL> CONNECT u_analista/"&PWD_ANALISTA"@&SRV
+ERROR:
+ORA-28000: La cuenta está bloqueada.
+
+
+SQL> 
+SQL> -- Restablecer la cuenta (accion del DBA, queda auditada por ORA_ACCOUNT_MGMT)
+SQL> CONNECT / AS SYSDBA
+Conectado.
+SQL> ALTER SESSION SET CONTAINER = XEPDB1;
+
+Sesión modificada.
+
+SQL> SELECT username, account_status FROM dba_users WHERE username = 'U_ANALISTA';
+
+USERNAME                                                                                                                         ACCOUNT_STATUS
+-------------------------------------------------------------------------------------------------------------------------------- --------------------------------
+U_ANALISTA                                                                                                                       LOCKED(TIMED)
+
+1 fila seleccionada.
+
+SQL> ALTER USER u_analista ACCOUNT UNLOCK;
+
+Usuario modificado.
+
+SQL> 
+SQL> -- =====================================================================
+SQL> -- AUDITOR (revisa evidencias, no puede alterarlas)
+SQL> -- =====================================================================
+SQL> CONNECT u_auditor/"&PWD_AUDITOR"@&SRV
+Conectado.
+SQL> 
+SQL> PROMPT >>> PRB-18 [A.8.20] Cifrado de la sesion TCP actual
+>>> PRB-18 [A.8.20] Cifrado de la sesion TCP actual
+SQL> PROMPT	Esperado: "AES256 Encryption service adapter" y
+Esperado: "AES256 Encryption service adapter" y
+SQL> PROMPT		  "SHA256 Crypto-checksumming service adapter"
+"SHA256 Crypto-checksumming service adapter"
+SQL> COLUMN network_service_banner FORMAT A90
+SQL> SELECT network_service_banner FROM v$session_connect_info
+  2  WHERE  sid = SYS_CONTEXT('USERENV','SID');
+
+NETWORK_SERVICE_BANNER
+------------------------------------------------------------------------------------------
+Windows NT TCP/IP NT Protocol Adapter for 64-bit Windows: Version 21.0.0.0.0 - Production
+Authentication service for 64-bit Windows: Version 21.0.1.0.0 - Production
+NTS Authentication service adapter for 64-bit Windows: Version 2.0.0.0.0 - Production
+Encryption service for 64-bit Windows: Version 21.0.1.0.0 - Production
+AES256 Encryption service adapter for 64-bit Windows: Version 21.0.1.0.0 - Production
+Crypto-checksumming service for 64-bit Windows: Version 21.0.1.0.0 - Production
+SHA256 Crypto-checksumming service adapter for 64-bit Windows: Version 21.0.1.0.0 - Produc
+tion
+
+
+7 filas seleccionadas.
+
+SQL> SELECT SYS_CONTEXT('USERENV','NETWORK_PROTOCOL') AS protocolo,
+  2  	    SYS_CONTEXT('USERENV','IP_ADDRESS')       AS ip_cliente
+  3  FROM dual;
+
+PROTOCOLO
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+IP_CLIENTE
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+tcp
+127.0.0.1
+
+
+1 fila seleccionada.
+
+SQL> 
+SQL> PROMPT >>> PRB-14 [A.8.15] Eventos generados por estas pruebas
+>>> PRB-14 [A.8.15] Eventos generados por estas pruebas
+SQL> PROMPT	Esperado: SELECT/UPDATE sobre CLIENTES, LOGON fallidos (1017/28000),
+Esperado: SELECT/UPDATE sobre CLIENTES, LOGON fallidos (1017/28000),
+SQL> PROMPT		  ALTER USER del desbloqueo
+ALTER USER del desbloqueo
+SQL> COLUMN dbusername FORMAT A16
+SQL> COLUMN action_name FORMAT A14
+SQL> COLUMN object_name FORMAT A12
+SQL> COLUMN unified_audit_policies FORMAT A28
+SQL> SELECT TO_CHAR(event_timestamp,'HH24:MI:SS') AS hora, dbusername, action_name,
+  2  	    object_name, return_code, unified_audit_policies
+  3  FROM   unified_audit_trail
+  4  WHERE  event_timestamp > SYSTIMESTAMP - INTERVAL '30' MINUTE
+  5  AND    dbusername IN ('U_ANALISTA','U_OPERADOR','U_DESARROLLADOR','SYS')
+  6  ORDER  BY event_timestamp;
+
+HORA     DBUSERNAME       ACTION_NAME    OBJECT_NAME  RETURN_CODE UNIFIED_AUDIT_POLICIES
+-------- ---------------- -------------- ------------ ----------- ----------------------------
+12:44:32 SYS              ALTER USER     U_ANALISTA             0 ORA_ACCOUNT_MGMT, ORA_SECURE
+                                                                  CONFIG, POL_AUD_ADMIN_CONF
+
+12:44:32 SYS              ALTER USER     U_ANALISTA             0 ORA_ACCOUNT_MGMT, ORA_SECURE
+                                                                  CONFIG, POL_AUD_ADMIN_CONF
+
+12:44:32 SYS              ALTER USER     U_ANALISTA             0 ORA_ACCOUNT_MGMT, ORA_SECURE
+                                                                  CONFIG, POL_AUD_ADMIN_CONF
+
+12:44:32 SYS              ALTER USER     U_OPERADOR             0 ORA_ACCOUNT_MGMT, ORA_SECURE
+                                                                  CONFIG, POL_AUD_ADMIN_CONF
+
+12:44:32 SYS              ALTER USER     U_OPERADOR             0 ORA_ACCOUNT_MGMT, ORA_SECURE
+                                                                  CONFIG, POL_AUD_ADMIN_CONF
+
+12:44:32 SYS              ALTER USER     U_OPERADOR             0 ORA_ACCOUNT_MGMT, ORA_SECURE
+                                                                  CONFIG, POL_AUD_ADMIN_CONF
+
+12:44:32 SYS              ALTER USER     U_AUDITOR              0 ORA_ACCOUNT_MGMT, ORA_SECURE
+                                                                  CONFIG, POL_AUD_ADMIN_CONF
+
+12:44:32 SYS              ALTER USER     U_AUDITOR              0 ORA_ACCOUNT_MGMT, ORA_SECURE
+                                                                  CONFIG, POL_AUD_ADMIN_CONF
+
+12:44:32 SYS              ALTER USER     U_AUDITOR              0 ORA_ACCOUNT_MGMT, ORA_SECURE
+                                                                  CONFIG, POL_AUD_ADMIN_CONF
+
+12:44:32 SYS              ALTER USER     U_DBA_JR               0 ORA_ACCOUNT_MGMT, ORA_SECURE
+                                                                  CONFIG, POL_AUD_ADMIN_CONF
+
+12:44:32 SYS              ALTER USER     U_DBA_JR               0 ORA_ACCOUNT_MGMT, ORA_SECURE
+                                                                  CONFIG, POL_AUD_ADMIN_CONF
+
+12:44:32 SYS              ALTER USER     U_DBA_JR               0 ORA_ACCOUNT_MGMT, ORA_SECURE
+                                                                  CONFIG, POL_AUD_ADMIN_CONF
+
+12:44:32 SYS              ALTER USER     U_DESARROLLA           0 ORA_ACCOUNT_MGMT, ORA_SECURE
+                                         DOR                      CONFIG, POL_AUD_ADMIN_CONF
+
+12:44:32 SYS              ALTER USER     U_DESARROLLA           0 ORA_ACCOUNT_MGMT, ORA_SECURE
+                                         DOR                      CONFIG, POL_AUD_ADMIN_CONF
+
+12:44:32 SYS              ALTER USER     U_DESARROLLA           0 ORA_ACCOUNT_MGMT, ORA_SECURE
+                                         DOR                      CONFIG, POL_AUD_ADMIN_CONF
+
+13:00:44 U_ANALISTA       SELECT         CLIENTES               0 POL_AUD_DATOS_CONF
+13:00:44 U_ANALISTA       UPDATE         CLIENTES            2004 POL_AUD_DATOS_CONF
+13:00:44 U_ANALISTA       SELECT         CLIENTES               0 POL_AUD_DATOS_CONF
+13:00:44 U_ANALISTA       SELECT         CLIENTES           28081 POL_AUD_DATOS_CONF
+13:00:44 U_OPERADOR       SELECT         CLIENTES               0 POL_AUD_DATOS_CONF
+13:00:44 U_OPERADOR       UPDATE         CLIENTES               0 POL_AUD_DATOS_CONF
+13:00:44 U_OPERADOR       DELETE         CLIENTES            2004 POL_AUD_DATOS_CONF
+13:00:44 U_OPERADOR       DELETE         CLIENTES               0 POL_AUD_DATOS_CONF
+13:00:44 U_OPERADOR       SELECT         CLIENTES               0 POL_AUD_DATOS_CONF
+13:00:45 U_DESARROLLADOR  SELECT         CLIENTES            2004 POL_AUD_DATOS_CONF
+13:00:46 U_ANALISTA       LOGON                              1017 ORA_LOGON_FAILURES
+13:00:47 U_ANALISTA       LOGON                              1017 ORA_LOGON_FAILURES
+13:00:49 U_ANALISTA       LOGON                              1017 ORA_LOGON_FAILURES
+13:00:49 U_ANALISTA       LOGON                             28000 ORA_LOGON_FAILURES
+13:00:50 SYS              ALTER USER     U_ANALISTA             0 ORA_ACCOUNT_MGMT, ORA_SECURE
+                                                                  CONFIG, POL_AUD_ADMIN_CONF
+
+13:03:20 SYS              INSERT         CLIENTES               0 POL_AUD_DATOS_CONF
+13:03:20 SYS              SELECT         CLIENTES               0 POL_AUD_DATOS_CONF
+13:03:20 SYS              ALTER USER     U_ANALISTA             0 ORA_ACCOUNT_MGMT, ORA_SECURE
+                                                                  CONFIG, POL_AUD_ADMIN_CONF
+
+13:03:20 U_ANALISTA       SELECT         CLIENTES               0 POL_AUD_DATOS_CONF
+13:03:20 U_ANALISTA       SELECT         CLIENTES               0 POL_AUD_DATOS_CONF
+13:03:20 U_ANALISTA       UPDATE         CLIENTES            2004 POL_AUD_DATOS_CONF
+13:03:20 U_ANALISTA       SELECT         CLIENTES           28081 POL_AUD_DATOS_CONF
+13:03:21 U_OPERADOR       UPDATE         CLIENTES               0 POL_AUD_DATOS_CONF
+13:03:21 U_OPERADOR       SELECT         CLIENTES               0 POL_AUD_DATOS_CONF
+13:03:21 U_OPERADOR       DELETE         CLIENTES               0 POL_AUD_DATOS_CONF
+13:03:21 U_OPERADOR       SELECT         CLIENTES               0 POL_AUD_DATOS_CONF
+13:03:21 U_OPERADOR       DELETE         CLIENTES            2004 POL_AUD_DATOS_CONF
+13:03:21 U_DESARROLLADOR  SELECT         CLIENTES            2004 POL_AUD_DATOS_CONF
+13:03:22 U_ANALISTA       LOGON                              1017 ORA_LOGON_FAILURES
+13:03:24 U_ANALISTA       LOGON                              1017 ORA_LOGON_FAILURES
+13:03:25 U_ANALISTA       LOGON                              1017 ORA_LOGON_FAILURES
+13:03:25 U_ANALISTA       LOGON                             28000 ORA_LOGON_FAILURES
+13:03:26 SYS              ALTER USER     U_ANALISTA             0 ORA_ACCOUNT_MGMT, ORA_SECURE
+                                                                  CONFIG, POL_AUD_ADMIN_CONF
+
+
+48 filas seleccionadas.
+
+SQL> 
+SQL> PROMPT >>> PRB-07b [A.5.33] Auditor intenta borrar registros de auditoria
+>>> PRB-07b [A.5.33] Auditor intenta borrar registros de auditoria
+SQL> PROMPT	Esperado: error (ORA-01031 / ORA-01752 / ORA-46385) - registros inmutables
+Esperado: error (ORA-01031 / ORA-01752 / ORA-46385) - registros inmutables
+SQL> DELETE FROM unified_audit_trail WHERE ROWNUM = 1;
+DELETE FROM unified_audit_trail WHERE ROWNUM = 1
+            *
+ERROR en línea 1:
+ORA-01031: privilegios insuficientes
+
+
+SQL> 
+SQL> PROMPT >>> Fin de la bateria de pruebas
+>>> Fin de la bateria de pruebas
+SQL> SPOOL OFF
