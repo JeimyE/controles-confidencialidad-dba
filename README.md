@@ -14,9 +14,10 @@ Marco de controles basado en ISO/IEC 27001:2022 (Anexo A) e ISO/IEC 27002:2022 p
 | `scripts/evidencia_pruebas.txt` | Salida de la batería de pruebas por usuario (script 21) |
 | `scripts/evidencia_controles.txt` | Salida de la verificación de los 18 controles (script 20) |
 | `scripts/evidencia_backup.log` | Bitácora de RMAN: respaldo cifrado AES256 y `RESTORE DATABASE VALIDATE` |
+| `index.html` | Artefacto interactivo (publicado con GitHub Pages) |
 | `informe/` | Informe en PDF con marco teórico, resultados, hallazgos, tabla de uso de IA y referencias APA 7 |
 
-**Artefacto interactivo:** https://claude.ai/artifact/XJjF1jrF4i5Fh2Ef4KcFoS
+**Artefacto interactivo:** https://jeimye.github.io/controles-confidencialidad-dba/
 
 ## Resumen de resultados
 
