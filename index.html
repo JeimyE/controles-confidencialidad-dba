@@ -246,6 +246,7 @@ footer.foot{margin-top:28px;font-size:12.5px;color:var(--muted)}
         <p id="ph-d"></p>
       </div>
       <div class="actions">
+        <a class="btn" href="https://youtu.be/3mNyXkx-qyU"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9.5v5l4.5-2.5z"/></svg>Video</a>
         <a class="btn" href="https://github.com/JeimyE/controles-confidencialidad-dba"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5"/></svg>Repositorio</a>
         <a class="btn primary" href="informe/Informe_Controles_Confidencialidad_DBA_Jeimy_Espinoza.pdf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>Informe PDF</a>
       </div>
@@ -337,7 +338,7 @@ footer.foot{margin-top:28px;font-size:12.5px;color:var(--muted)}
       <p class="note">Los archivos están en la carpeta <span class="mono">scripts/</span> del repositorio, junto con evidencia_pruebas.txt, evidencia_controles.txt y evidencia_backup.log.</p></div>
     </section>
 
-    <footer class="foot">Referencias: ISO/IEC 27001:2022, ISO/IEC 27002:2022, Ley N.° 8968 y su Reglamento (Decreto 37554-JP), documentación de Oracle Database 21c. Datos de laboratorio ficticios.</footer>
+    <footer class="foot">Referencias: ISO/IEC 27001:2022, ISO/IEC 27002:2022, Ley N.° 8968 y su Reglamento (Decreto 37554-JP), documentación de Oracle Database 21c. Datos de laboratorio ficticios.<br>Desarrollado con apoyo de inteligencia artificial generativa; su uso y la validación realizada están declarados en la sección 8 del informe.</footer>
   </div>
 </div>
 <div class="tip" id="tip" hidden></div>
@@ -501,7 +502,7 @@ pintarPruebas();
 /* mejora y scripts */
 $("#tb-mejora").innerHTML = D.MEJORA.map(m => { const c = D.CTRL.find(x => x.id === m[0]); const [t,cl] = estado(c ? c.lv : 0);
   return `<tr><td style="min-width:120px"><span class="tag">${m[0]}</span><span class="sub" style="margin-top:6px"><span class="pill ${cl}">${t}</span></span></td><td style="min-width:240px">${esc(m[1])}</td><td style="min-width:280px">${esc(m[2])}</td><td>${esc(m[3])}</td><td class="c">Nivel ${m[4]}</td></tr>`; }).join("");
-$("#tb-scripts").innerHTML = D.SCRIPTS.map((s,i) => `<div class="st"><b class="n">${i+1}</b><div><div class="f">${s[0]}</div><p>${esc(s[1])}</p></div></div>`).join("");
+$("#tb-scripts").innerHTML = D.SCRIPTS.map((s,i) => `<div class="st"><b class="n">${i+1}</b><div><div class="f"><a href="https://github.com/JeimyE/controles-confidencialidad-dba/blob/main/scripts/${s[0]}">${s[0]}</a></div><p>${esc(s[1])}</p></div></div>`).join("");
 
 show((location.hash || "#resumen").slice(1), false);
 </script>

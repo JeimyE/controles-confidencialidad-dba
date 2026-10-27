@@ -19,11 +19,17 @@ Marco de controles basado en ISO/IEC 27001:2022 (Anexo A) e ISO/IEC 27002:2022 p
 
 **Artefacto interactivo:** https://jeimye.github.io/controles-confidencialidad-dba/
 
+**Video explicativo:** https://youtu.be/3mNyXkx-qyU
+
 ## Resumen de resultados
 
 - 18 controles evaluados (15 del enunciado y 3 complementarios: A.8.8, A.8.24 y A.8.33).
 - 16 cumplen y 2 quedan en estado parcial: A.8.12 (PUBLIC con paquetes `UTL_*`) y A.8.8 (XE sin parches).
 - 25 pruebas definidas, 22 ejecutadas y conformes; PRB-03, PRB-19 y PRB-24 quedan pendientes.
+
+## Nota sobre la evidencia de respaldo
+
+Las últimas líneas de `scripts/evidencia_backup.log` muestran un error de sintaxis de RMAN (`RMAN-00558 … OFFSPOOL`). Se produjo al escribir dos veces el comando `SPOOL LOG OFF`, después de que el respaldo y la validación `RESTORE DATABASE VALIDATE` terminaron correctamente; no afecta al respaldo.
 
 ## Nota de seguridad
 
